@@ -1,3 +1,4 @@
 # Build output
 /index.*
 /*.o
+PHOTON_APP_ID.SECRET
