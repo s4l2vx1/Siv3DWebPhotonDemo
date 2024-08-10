@@ -1,1 +1,4 @@
 -s EXCEPTION_CATCHING_ALLOWED=["main","_ZN3s3d7TryMainEv"]
+photon/Photon-Emscripten-Sdk_v5-0-11-0/Common-cpp/lib/Common-cpp_debug_emscripten_Emscripten.bc
+photon/Photon-Emscripten-Sdk_v5-0-11-0/LoadBalancing-cpp/lib/LoadBalancing-cpp_debug_emscripten_Emscripten.bc
+photon/Photon-Emscripten-Sdk_v5-0-11-0/Photon-cpp/lib/Photon-cpp_debug_emscripten_Emscripten.bc

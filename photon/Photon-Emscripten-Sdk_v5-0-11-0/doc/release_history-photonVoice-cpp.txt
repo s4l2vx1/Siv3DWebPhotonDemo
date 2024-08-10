@@ -1,0 +1,124 @@
+* release_history-photonVoice-cpp.txt
+* Release history for the Exit Games PhotonVoice C++ Client Library
+
+Copyright (C) 2004-2024 Exit Games GmbH, http://www.photonengine.com
+
+Questions? Write to developer@photonengine.com or visit forum.photonengine.com
+
+*** version 5.0.11.0
+	Date: 04-30-2024
+	- changed: IDecoder.input() accepts FrameBuffer instead of Buffer<nByte>
+	- added: AudioUtil resample() overloads accepting raw arrays instead of Buffer
+	- changed: Voice.Codec is an enum
+	- removed: static Buffer.getEmpty(), components create their own empty Buffer if required
+	- added: support in LoadBalancingTransport for payload encryption of voice stream data (ignored when you pass 'true' for the 'direct' parameter in the LoadBalancingTransport constructor)
+
+
+*** version 5.0.10.0
+	Date: 10-23-2023
+	- added: Emscripten support
+
+
+*** version 5.0.9.0
+	Date: 10-17-2023
+	- added: class SendFrameParams
+	- added: class AudioUtil::ToneGen
+	- added: class AudioUtil::ToneAudioPusherBase
+	- added: class AudioUtil::ToneAudioPusherService
+	- changed: LoadBalancingListener::createRoomReturn() is no longer pure virtual
+	- changed: LoadBalancingListener::joinOrCreateRoomReturn() is no longer pure virtual
+	- changed: LoadBalancingListener::joinRandomOrCreateRoomReturn() is no longer pure virtual
+	- changed: LoadBalancingListener::joinRoomReturn() is no longer pure virtual
+	- changed: LoadBalancingListener::joinRandomRoomReturn() is no longer pure virtual
+	- changed: LoadBalancingListener::leaveRoomReturn() is no longer pure virtual
+	- changed: class LoadBalancingTransport now additionally to it's existing base classes also inherits from ILogger
+	- changed: the constructor of class PhotonTransportProtocol now takes an ILogger* instead of an ILogger& as it's only argument
+	- changed: the destructor of class PhotonTransportProtocol is no longer virtual
+	- removed: parameter 'voicesToSend' from PhotonTransportProtocol::buildVoicesInfo()
+	- added: parameter 'v' to PhotonTransportProtocol::buildVoicesInfo()
+	- added: PhotonTransportProtocol::getPayloadFragmentSize()
+	- added: PhotonTransportProtocol::buildFrameEvent()
+	- added: class VoiceCreateOptions
+	- added: LocalVoice::setTargetPlayersDisabled()
+	- added: LocalVoice::setTargetPlayers()
+	- added: LocalVoice::NO_TRANSMIT_TIMEOUT_MS
+	- changed: class IVoiceTransport does no longer inherit from class ILogger
+	- removed: IVoiceTransport::sendVoicesInfo()
+	- removed: IVoiceTransport::setDebugEchoMode()
+	- added: IVoiceTransport::sendVoiceInfo()
+	- removed: parameter 'targetPlayerId' from IVoiceTransport::sendVoiceRemove()
+	- added: parameters 'targetMe', 'targetPlayers' and 'numTargetPlayers' to IVoiceTransport::sendVoiceRemove()
+	- removed: parameter 'localVoice' from IVoiceTransport::sendFrame()
+	- added: parameters 'flags', 'frNumber,' and 'par' to IVoiceTransport::sendFrame()
+	- added: IVoiceTransport::getPayloadFragmentSize()
+	- added: class VoiceClient::CreateOptions
+	- added: a new parameter 'logger' to the consturctor of class VoiceClient
+	- added: a newoptional parameter 'options' to the consturctor of class VoiceClient
+	- added: VoiceClient::getLogger()
+	- added: VoiceClient::getThreadingEnabled() (false for Emscripten without threads)
+	- removed: parameter 'encoder' from VoiceClient::createLocalVoice()
+	- removed: parameter 'encoder' from VoiceClient::createLocalVoiceFramed()
+	- removed: parameter 'encoder' from VoiceClient::createLocalVoiceAudio()
+	- removed: parameter 'encoder' from VoiceClient::createLocalVoiceAudioFromSource()
+	- added: parameter 'options' to VoiceClient::createLocalVoice()
+	- added: parameter 'options' to VoiceClient::createLocalVoiceFramed()
+	- added: parameter 'options' to VoiceClient::createLocalVoiceAudio()
+	- added: parameter 'options' to VoiceClient::createLocalVoiceAudioFromSource()
+	- added: VoiceClient::onJoinAllChannels()
+	- added: an overload of VoiceClient::onPlayerJoin() without a 'channelId' parameter
+	- added: an overload of VoiceClient::onPlayerLeave() without a 'channelId' parameter
+	- removed: VoiceClient::getGlobalInterestGroup()
+	- removed: VoiceClient::setGlobalInterestGroup()
+	- added: namespace FrameFlags
+	- added: parameter 'flags' to IEncoder::setOutput()
+	- added: parameter 'flags' to IEncoder::dequeueOutput()
+	- changed: voice ids are allocated in a range from 1 to 15 by default
+	- changed: LocalVoice.getIsCurrentlyTransmitting() measures the time since the last send instead of counting service() calls while not sending
+	- changed: LocalVoice is responsible for sending signalling packets in onJoinChannel(), onPlayerJoin() called by VoiceClient
+	- removed: LoadBalancingTransport::getGlobalInterestGroup() (use the LoadBalancing API instead)
+	- removed: LoadBalancingTransport::setGlobalInterestGroup() (use the LoadBalancing API instead)
+	- changed: the enet channel is no longer automatically assigned by LoadBalancingTransport per media type, the user may assign the channel to the LocalVoice during initialization
+	- changed: renamed parameter 'pLocalVoice' of IAudioPusher::setCallback() into 'opaque'
+
+
+*** version 5.0.6.0
+	Date: 02-23-2023
+	- added: Transport Protocol 2 support for compatibility with recent versions of the Photon Voice Unity3D asset
+	- removed: PhotonTransportProtocol::buildFrameMessage()
+	- added: PhotonTransportProtocol::onVoiceFrameEvent()
+
+
+*** version 5.0.3.0
+	Date: 03-28-2022
+	- changed: IAudioPusher is not Retainable anymore
+	- changed: VoiceClient.createLocalVoiceAudioFromSource accepts IAudioPusher<T>* instead of reference
+	- changed: function AudioUtil.resample() and class AudioUtil.Resampler() accept destination data size in audio samples (to update the caller, divide the parameter by the number of channels)
+	- added: AudioUtil.resample() overloads: with arbitrary data offset and size for both source and destination, with different number of channels for source and destination
+	- added: AudioOutDelayControl: abstract IAudioOut implementation keeping given playback delay by increasing input frames tempo; only output writer and write position getter are required from concrete implementation
+	- removed: ISyncAudioOut and AudioStreamPlayer; use AudioOutDelayControl instead
+
+
+*** version 5.0.2.3
+	Date: 01-19-2022
+	- fixed: class IAudioPusher was hiding it's inherited assignment operators
+
+
+*** version 5.0.1.0
+	Date: 10-26-2021
+	- fixed: the echo mode did not work when the sendDirect flag of class LoadBalancingTransport was set to true
+	- changed: PhotonTransportProtocol::buildVoicesInfo() now returns a Common::ValueObject<Common::Object*> instead of a Common::Object
+	- changed: PhotonTransportProtocol::buildVoiceRemoveMessage() now returns a Common::ValueObject<Common::Object*> instead of a Common::Object
+	- changed: PhotonTransportProtocol::buildFrameMessage() now returns a Common::ValueObject<Common::Object*> instead of a Common::Object
+
+
+*** version 5.0.0.3
+	Date: 09-30-2021
+	- fixed: undefined references for AudioUtil::LevelMeter<float>
+	- fixed: undefined references for AudioUtil::LevelMeter<short>
+	- fixed: undefined references for AudioUtil::VoiceDetector<float>
+	- fixed: undefined references for AudioUtil::VoiceDetector<short>
+
+
+*** version 5.0.0.0
+	Date: 08-03-2021
+	- initial version of the Photon Voice C++ Library

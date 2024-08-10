@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Chat-cpp_vc14", "Chat-cpp_vc14.vcxproj", "{C3B191D8-97AE-472B-9205-A7B546AA0ED2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_emscripten|Emscripten = debug_emscripten|Emscripten
+		release_emscripten|Emscripten = release_emscripten|Emscripten
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3B191D8-97AE-472B-9205-A7B546AA0ED2}.debug_emscripten|Emscripten.ActiveCfg = debug_emscripten|Emscripten
+		{C3B191D8-97AE-472B-9205-A7B546AA0ED2}.debug_emscripten|Emscripten.Build.0 = debug_emscripten|Emscripten
+		{C3B191D8-97AE-472B-9205-A7B546AA0ED2}.debug_emscripten|Emscripten.Build.2 = release_windows_md|Emscripten
+		{C3B191D8-97AE-472B-9205-A7B546AA0ED2}.debug_emscripten|Emscripten.Build.4 = debug_windows_md|Emscripten
+		{C3B191D8-97AE-472B-9205-A7B546AA0ED2}.release_emscripten|Emscripten.ActiveCfg = release_emscripten|Emscripten
+		{C3B191D8-97AE-472B-9205-A7B546AA0ED2}.release_emscripten|Emscripten.Build.0 = release_emscripten|Emscripten
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

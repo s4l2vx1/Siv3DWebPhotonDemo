@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opus_egpv", "opus_egpv.vcxproj", "{219EC965-228A-1824-174D-96449D05F88A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_emscripten|Emscripten = debug_emscripten|Emscripten
+		release_emscripten|Emscripten = release_emscripten|Emscripten
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{219EC965-228A-1824-174D-96449D05F88A}.debug_emscripten|Emscripten.ActiveCfg = debug_emscripten|Emscripten
+		{219EC965-228A-1824-174D-96449D05F88A}.debug_emscripten|Emscripten.Build.0 = debug_emscripten|Emscripten
+		{219EC965-228A-1824-174D-96449D05F88A}.release_emscripten|Emscripten.ActiveCfg = release_emscripten|Emscripten
+		{219EC965-228A-1824-174D-96449D05F88A}.release_emscripten|Emscripten.Build.0 = release_emscripten|Emscripten
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

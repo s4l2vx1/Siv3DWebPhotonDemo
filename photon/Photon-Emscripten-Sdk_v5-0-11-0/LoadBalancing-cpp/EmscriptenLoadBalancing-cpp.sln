@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LoadBalancing-cpp_vc14", "LoadBalancing-cpp_vc14.vcxproj", "{EA5D8C8B-8D27-46E4-BDD9-DBD6A3C685E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_emscripten|Emscripten = debug_emscripten|Emscripten
+		release_emscripten|Emscripten = release_emscripten|Emscripten
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EA5D8C8B-8D27-46E4-BDD9-DBD6A3C685E8}.debug_emscripten|Emscripten.ActiveCfg = debug_emscripten|Emscripten
+		{EA5D8C8B-8D27-46E4-BDD9-DBD6A3C685E8}.debug_emscripten|Emscripten.Build.0 = debug_emscripten|Emscripten
+		{EA5D8C8B-8D27-46E4-BDD9-DBD6A3C685E8}.release_emscripten|Emscripten.ActiveCfg = release_emscripten|Emscripten
+		{EA5D8C8B-8D27-46E4-BDD9-DBD6A3C685E8}.release_emscripten|Emscripten.Build.0 = release_emscripten|Emscripten
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

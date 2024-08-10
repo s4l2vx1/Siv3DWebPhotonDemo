@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhotonVoice-cpp_vc14", "PhotonVoice-cpp_vc14.vcxproj", "{30589D8A-02FA-47C2-8751-AE63A103C769}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug_emscripten|Emscripten = debug_emscripten|Emscripten
+		release_emscripten|Emscripten = release_emscripten|Emscripten
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{30589D8A-02FA-47C2-8751-AE63A103C769}.debug_emscripten|Emscripten.ActiveCfg = debug_emscripten|Emscripten
+		{30589D8A-02FA-47C2-8751-AE63A103C769}.debug_emscripten|Emscripten.Build.0 = debug_emscripten|Emscripten
+		{30589D8A-02FA-47C2-8751-AE63A103C769}.debug_emscripten|Emscripten.Build.2 = release_windows_md|Emscripten
+		{30589D8A-02FA-47C2-8751-AE63A103C769}.debug_emscripten|Emscripten.Build.4 = debug_windows_md|Emscripten
+		{30589D8A-02FA-47C2-8751-AE63A103C769}.release_emscripten|Emscripten.ActiveCfg = release_emscripten|Emscripten
+		{30589D8A-02FA-47C2-8751-AE63A103C769}.release_emscripten|Emscripten.Build.0 = release_emscripten|Emscripten
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
