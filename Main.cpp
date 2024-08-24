@@ -186,7 +186,7 @@ class MyNetwork : public Multiplayer_Photon
 public:
 
 	MyNetwork()
-		: Multiplayer_Photon(std::string(SIV3D_OBFUSCATE(PHOTON_APP_ID)), U"1.0", Console)
+		: Multiplayer_Photon(std::string(SIV3D_OBFUSCATE(PHOTON_APP_ID)), U"1.0", Console, Verbose::Yes, ConnectionProtocol::Wss)
 	{
 		RegisterEventCallback(111, &MyNetwork::customDataReceive111);
 	}

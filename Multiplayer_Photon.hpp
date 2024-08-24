@@ -100,15 +100,16 @@ namespace s3d
 	};
 
 	/// @brief 通信時に用いるプロトコル
+	/// @remark Web 版においてHTTPSを使用する場合は Wss を使用してください。
 	enum class ConnectionProtocol : uint8
 	{
 		Default = 0,
-	# if SIV3D_PLATFORM(WEB)
-		Ws = 0,
-		Wss = 1,
-	# else
+	# if not SIV3D_PLATFORM(WEB)
 		UDP = 0,
 		TCP = 1,
+	# else
+		Ws = 0,
+		Wss = 1,
 	# endif
 	};
 
