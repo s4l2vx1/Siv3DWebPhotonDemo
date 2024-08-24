@@ -14934,8 +14934,6 @@ var ASM_CONSTS = {
   
           let result;
   
-          console.log(opt_ptr ? UTF32ToString(opt_ptr) : null);
-  
           if (join) {
               result = siv3dPhotonClient.joinRoom(
                   UTF32ToString(roomName_ptr),
@@ -15215,8 +15213,6 @@ var ASM_CONSTS = {
               return false;
           }
   
-          console.log(filter_ptr ? UTF32ToString(filter_ptr) : null);
-  
           const result = siv3dPhotonClient.joinRandomRoom({
               expectedMaxPlayers: maxPlayers,
               matchmakingMode: matchmakingMode,
@@ -15261,7 +15257,7 @@ var ASM_CONSTS = {
       }
 
   function _siv3dPhotonRaiseEvent(eventCode, data_ptr, opt) {
-          return siv3dPhotonClient.raiseEvent(eventCode, data_ptr ? UTF8ToString(data_ptr) : null, UTF32ToString(opt));
+          return siv3dPhotonClient.raiseEvent(eventCode, data_ptr ? UTF8ToString(data_ptr) : "", JSON.parse(UTF32ToString(opt)));
       }
 
   function _siv3dPhotonReconnectToMaster() {
@@ -15322,8 +15318,9 @@ var ASM_CONSTS = {
           let callbackCacheList = siv3dPhotonClient.callbackCacheList;
           siv3dPhotonClient.callbackCacheList = [];
           for (const callback of callbackCacheList) {
-              console.log(callback.type);
-              console.log(siv3dPhotonClient.waitingCallback);
+              console.log("[Multiplayer_Photon] [js] siv3dPhotonService");
+              console.log("[Multiplayer_Photon] [js] callback: ", callback.type);
+              console.log("[Multiplayer_Photon] [js] waiting: ", siv3dPhotonClient.waitingCallback);
               switch (callback.type) {
                   case siv3dPhotonCallbackCode.ConnectionErrorReturn:
                       siv3dPhotonClient.waitingCallback = null;

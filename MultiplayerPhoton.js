@@ -188,8 +188,9 @@ mergeInto(LibraryManager.library, {
         let callbackCacheList = siv3dPhotonClient.callbackCacheList;
         siv3dPhotonClient.callbackCacheList = [];
         for (const callback of callbackCacheList) {
-            console.log(callback.type);
-            console.log(siv3dPhotonClient.waitingCallback);
+            console.log("[Multiplayer_Photon] [js] siv3dPhotonService");
+            console.log("[Multiplayer_Photon] [js] callback: ", callback.type);
+            console.log("[Multiplayer_Photon] [js] waiting: ", siv3dPhotonClient.waitingCallback);
             switch (callback.type) {
                 case siv3dPhotonCallbackCode.ConnectionErrorReturn:
                     siv3dPhotonClient.waitingCallback = null;
@@ -323,8 +324,6 @@ mergeInto(LibraryManager.library, {
             return false;
         }
 
-        console.log(filter_ptr ? UTF32ToString(filter_ptr) : null);
-
         const result = siv3dPhotonClient.joinRandomRoom({
             expectedMaxPlayers: maxPlayers,
             matchmakingMode: matchmakingMode,
@@ -344,10 +343,6 @@ mergeInto(LibraryManager.library, {
         if (siv3dPhotonClient.waitingCallback) {
             return false;
         }
-
-        console.log(filter_ptr ? UTF32ToString(filter_ptr) : null);
-
-        console.log(opt_ptr ? UTF32ToString(opt_ptr) : null);
 
         const result = siv3dPhotonClient.joinRandomOrCreateRoom(
             {
@@ -393,8 +388,6 @@ mergeInto(LibraryManager.library, {
         }
 
         let result;
-
-        console.log(opt_ptr ? UTF32ToString(opt_ptr) : null);
 
         if (join) {
             result = siv3dPhotonClient.joinRoom(
@@ -458,7 +451,7 @@ mergeInto(LibraryManager.library, {
     siv3dPhotonChangeInterestGroup__deps: ["$siv3dPhotonClient"],
 
     siv3dPhotonRaiseEvent: function (eventCode, data_ptr, opt) {
-        return siv3dPhotonClient.raiseEvent(eventCode, data_ptr ? UTF8ToString(data_ptr) : null, UTF32ToString(opt));
+        return siv3dPhotonClient.raiseEvent(eventCode, data_ptr ? UTF8ToString(data_ptr) : "", JSON.parse(UTF32ToString(opt)));
     },
     siv3dPhotonRaiseEvent__sig: "viii",
     siv3dPhotonRaiseEvent__deps: ["$siv3dPhotonClient", "$UTF32ToString"],
