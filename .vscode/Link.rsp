@@ -53,3 +53,6 @@
 --post-js OpenSiv3D/lib/Siv3D/Siv3D.post.js
 --post-js OpenSiv3D/Templates/Embeddable/web-player.js
 --js-library OpenSiv3D/lib/Siv3D/Siv3D.js
+
+--js-library MultiplayerPhoton.js
+--pre-js photon/photon-javascript-sdk_v4-2-0-0/lib/photon.js
