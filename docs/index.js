@@ -15280,13 +15280,13 @@ var ASM_CONSTS = {
 
   function _siv3dPhotonRemovePlayerCustomProperties(len, keys_ptr) {
           for (let i = 0; i < len; i++) {
-              siv3dPhotonClient.myActor().setCustomProperty(UTF32ToString(keys_ptr + i * 4), null);
+              siv3dPhotonClient.myActor().setCustomProperty(UTF32ToString(HEAP32[(keys_ptr >> 2) + i]), "");
           }
       }
 
   function _siv3dPhotonRemoveRoomCustomProperties(len, keys_ptr) {
           for (let i = 0; i < len; i++) {
-              siv3dPhotonClient.myRoom().setCustomProperty(UTF32ToString(keys_ptr + i * 4), null);
+              siv3dPhotonClient.myRoom().setCustomProperty(UTF32ToString(HEAP32[(keys_ptr >> 2) + i]), "");
           }
       }
 

@@ -576,7 +576,7 @@ mergeInto(LibraryManager.library, {
 
     siv3dPhotonRemovePlayerCustomProperties: function (len, keys_ptr) {
         for (let i = 0; i < len; i++) {
-            siv3dPhotonClient.myActor().setCustomProperty(UTF32ToString(keys_ptr + i * 4), null);
+            siv3dPhotonClient.myActor().setCustomProperty(UTF32ToString(HEAP32[(keys_ptr >> 2) + i]), "");
         }
     },
     siv3dPhotonRemovePlayerCustomProperties__sig: "vii",
@@ -606,7 +606,7 @@ mergeInto(LibraryManager.library, {
 
     siv3dPhotonRemoveRoomCustomProperties: function (len, keys_ptr) {
         for (let i = 0; i < len; i++) {
-            siv3dPhotonClient.myRoom().setCustomProperty(UTF32ToString(keys_ptr + i * 4), null);
+            siv3dPhotonClient.myRoom().setCustomProperty(UTF32ToString(HEAP32[(keys_ptr >> 2) + i]), "");
         }
     },
     siv3dPhotonRemoveRoomCustomProperties__sig: "vii",
