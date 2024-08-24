@@ -1381,7 +1381,10 @@ namespace s3d::detail
 	{
 		JSON json{};
 
-		json[U"interestGroup"] = eventOption.targetGroup();
+		if (eventOption.targetGroup() != 0)
+		{
+			json[U"interestGroup"] = eventOption.targetGroup();
+		}
 		EventCaching cache = EventCaching::DoNotCache;
 		ReceiverGroup receiver = ReceiverGroup::Others;
 		switch (eventOption.receiverOption())
@@ -1410,8 +1413,14 @@ namespace s3d::detail
 			break;
 		};
 		json[U"cache"] = static_cast<int32>(cache);
-		json[U"receivers"] = static_cast<int32>(receiver);
-		json[U"targetActors"] = eventOption.targetList();
+		if (static_cast<int32>(receiver) != 0)
+		{
+			json[U"receivers"] = static_cast<int32>(receiver);
+		}
+		if (eventOption.targetList())
+		{
+			json[U"targetActors"] = eventOption.targetList().value();
+		}
 
 		return json.formatMinimum();
 	}
@@ -1420,7 +1429,10 @@ namespace s3d::detail
 	{
 		JSON json{};
 
-		json[U"targetActors"] = targets;
+		if (targets.size() > 0)
+		{
+			json[U"targetActors"] = targets;
+		}
 
 		return json.formatMinimum();
 	}

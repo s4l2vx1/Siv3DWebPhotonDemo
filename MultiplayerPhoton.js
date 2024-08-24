@@ -582,17 +582,15 @@ mergeInto(LibraryManager.library, {
     siv3dPhotonRemovePlayerCustomProperties__sig: "vii",
     siv3dPhotonRemovePlayerCustomProperties__deps: ["$siv3dPhotonClient"],
 
-    siv3dPhotonGetRoomCustomProperty: function (key_ptr, actorNr) {
-        const actor = actorNr < 0 ? siv3dPhotonClient.myActor() : siv3dPhotonClient.myRoomActors()[actorNr];
-        const found = actor.getCustomProperty(UTF32ToString(key_ptr));
+    siv3dPhotonGetRoomCustomProperty: function (key_ptr) {
+        const found = siv3dPhotonClient.myRoom().getCustomProperty(UTF32ToString(key_ptr));
         return found ? siv3dStringToNewUTF32(found) : 0;
     },
     siv3dPhotonGetRoomCustomProperty__sig: "iii",
     siv3dPhotonGetRoomCustomProperty__deps: ["$siv3dPhotonClient"],
 
-    siv3dPhotonGetRoomCustomProperties: function (ptr, actorNr) {
-        const actor = actorNr < 0 ? siv3dPhotonClient.myActor() : siv3dPhotonClient.myRoomActors()[actorNr];
-        const obj = actor.getCustomProperties();
+    siv3dPhotonGetRoomCustomProperties: function (ptr) {
+        const obj = siv3dPhotonClient.myRoom().getCustomProperties();
         for (key in obj) {
             _siv3dPhotonGetCustomPropertiesCallback(ptr, siv3dStringToNewUTF32(key), siv3dStringToNewUTF32(obj[key]));
         }
@@ -601,21 +599,22 @@ mergeInto(LibraryManager.library, {
     siv3dPhotonGetRoomCustomProperties__deps: ["$siv3dPhotonClient", "$siv3dStringToNewUTF32", "siv3dPhotonGetCustomPropertiesCallback"],
 
     siv3dPhotonSetRoomCustomProperty: function (key_ptr, value_ptr) {
-        siv3dPhotonClient.myActor().setCustomProperty(UTF32ToString(key_ptr), UTF32ToString(value_ptr));
+        siv3dPhotonClient.myRoom().setCustomProperty(UTF32ToString(key_ptr), UTF32ToString(value_ptr));
     },
     siv3dPhotonSetRoomCustomProperty__sig: "vii",
     siv3dPhotonSetRoomCustomProperty__deps: ["$siv3dPhotonClient", "$UTF32ToString"],
 
     siv3dPhotonRemoveRoomCustomProperties: function (len, keys_ptr) {
         for (let i = 0; i < len; i++) {
-            siv3dPhotonClient.myActor().setCustomProperty(UTF32ToString(keys_ptr + i * 4), null);
+            siv3dPhotonClient.myRoom().setCustomProperty(UTF32ToString(keys_ptr + i * 4), null);
         }
     },
     siv3dPhotonRemoveRoomCustomProperties__sig: "vii",
     siv3dPhotonRemoveRoomCustomProperties__deps: ["$siv3dPhotonClient", "$UTF32ToString"],
 
     siv3dPhotonGetVisibleRoomPropertyKeys: function (ptr) {
-        for (let prop of siv3dPhotonClient.myRoom().getPropsListedInLobby()) {
+        const obj = siv3dPhotonClient.myRoom().getPropsListedInLobby();
+        for (let prop of obj) {
             _siv3dPhotonGetVisibleRoomPropertyKeysCallback(ptr, siv3dStringToNewUTF32(prop));
         }
     },
