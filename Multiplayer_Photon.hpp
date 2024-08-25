@@ -269,24 +269,27 @@ namespace s3d
 		/// @param receiverOption 送信先のターゲット指定オプション
 		/// @param priorityIndex プライオリティインデックス　0に近いほど優先的に処理される
 		/// @remark Web 版では priorityIndex は無視されます。
+		template<class EventCode>
 		SIV3D_NODISCARD_CXX20
-		MultiplayerEvent(uint8 eventCode, EventReceiverOption receiverOption = EventReceiverOption::Others, uint8 priorityIndex = 0);
+		MultiplayerEvent(EventCode eventCode, EventReceiverOption receiverOption = EventReceiverOption::Others, uint8 priorityIndex = 0);
 
 		/// @brief 送信するイベントのオプション
 		/// @param eventCode イベントコード （1～199）
 		/// @param targetList 送信先のプレイヤーのローカル ID のリスト
 		/// @param priorityIndex プライオリティインデックス　0に近いほど優先的に処理される
 		/// @remark Web 版では priorityIndex は無視されます。
+		template<class EventCode>
 		SIV3D_NODISCARD_CXX20
-		MultiplayerEvent(uint8 eventCode, Array<LocalPlayerID> targetList, uint8 priorityIndex = 0);
+		MultiplayerEvent(EventCode eventCode, Array<LocalPlayerID> targetList, uint8 priorityIndex = 0);
 
 		/// @brief 送信するイベントのオプション
 		/// @param eventCode イベントコード （1～199）
 		/// @param targetGroup 送信先のイベントターゲットグループ（1以上255以下の整数）
 		/// @param priorityIndex プライオリティインデックス　0に近いほど優先的に処理される
 		/// @remark Web 版では priorityIndex は無視されます。
+		template<class EventCode>
 		SIV3D_NODISCARD_CXX20
-		MultiplayerEvent(uint8 eventCode, TargetGroup targetGroup, uint8 priorityIndex = 0);
+		MultiplayerEvent(EventCode eventCode, TargetGroup targetGroup, uint8 priorityIndex = 0);
 
 		[[nodiscard]]
 		uint8 eventCode() const noexcept;
@@ -344,7 +347,7 @@ namespace s3d
 
 		/// @brief デフォルトコンストラクタ。このコンストラクタを使用する場合は後で init を呼び出してください。
 		SIV3D_NODISCARD_CXX20
-		Multiplayer_Photon() = default;
+		Multiplayer_Photon();
 
 		/// @brief マルチプレイヤー用クラスを作成します。
 		/// @param secretPhotonAppID Photon アプリケーション ID
@@ -850,13 +853,15 @@ namespace s3d
 
 		/// @brief キャッシュされたイベントを削除します。
 		/// @param eventCode 削除するイベントコード, 0 の場合は全てのイベントを削除
-		void removeEventCache(uint8 eventCode = 0);
+		template<class EventCode>
+		void removeEventCache(EventCode eventCode = 0);
 
 		/// @brief キャッシュされたイベントを削除します。targetsで指定したプレイヤーに紐づくイベントのみ削除します。
 		/// @param eventCode 削除するイベントコード, 0 の場合は全てのイベントを削除
 		/// @param targets 対象のプレイヤーのローカル ID
 		/// @remark プレイヤーに紐づくイベントとは、EventReceiverOption::○○○_CacheUntilLeaveRoomによってキャッシュされたイベントのことです。
-		void removeEventCache(uint8 eventCode, const Array<LocalPlayerID>& targets);
+		template<class EventCode>
+		void removeEventCache(EventCode eventCode, const Array<LocalPlayerID>& targets);
 
 		/// @brief 自身のプレイヤー情報を返します。
 		LocalPlayer getLocalPlayer() const;
@@ -884,6 +889,13 @@ namespace s3d
 		/// @remark 現在は、ユーザー ID はユーザー名から自動的に生成されます。
 		[[nodiscard]]
 		String getUserID() const;
+
+		/// @brief 指定したローカルプレイヤーのユーザ ID を取得します。
+		/// @return ユーザ ID
+		/// @remark ユーザ ID は connect を呼びだした後は変更することができません。
+		/// @remark 現在は、ユーザー ID はユーザー名から自動的に生成されます。
+		[[nodiscard]]
+		String getUserID(LocalPlayerID localPlayerID) const;
 
 		/// @brief 自分が現在のルームのホストであるかを返します。
 		/// @return 自分が現在のルームのホストである場合 true, それ以外の場合は false
@@ -948,12 +960,19 @@ namespace s3d
 		/// @param isVisible ルームを見えるようにする場合 true, それ以外の場合は false
 		void setIsVisibleInCurrentRoom(bool isVisible);
 
-		/// @brief プレイヤープロパティを取得します。
+		/// @brief 自身のプレイヤープロパティを取得します。
+		/// @param key キー
+		String getPlayerProperty(StringView key) const;
+
+		/// @brief 指定したユーザのプレイヤープロパティを取得します。
 		/// @param localPlayerID ルーム内のローカルプレイヤー ID
 		/// @param key キー
 		String getPlayerProperty(LocalPlayerID localPlayerID, StringView key) const;
 
-		/// @brief プレイヤープロパティを取得します。
+		/// @brief 自身のプレイヤープロパティを取得します。
+		HashTable<String,String> getPlayerProperties() const;
+
+		/// @brief 指定したユーザのプレイヤープロパティを取得します。
 		/// @param localPlayerID ルーム内のローカルプレイヤー ID
 		HashTable<String,String> getPlayerProperties(LocalPlayerID localPlayerID) const;
 
@@ -968,7 +987,7 @@ namespace s3d
 
 		/// @brief 自身のプレイヤープロパティを削除します。
 		/// @param keys キーリスト
-		void removePlayerProperties(const Array<String>& keys);
+		void removePlayerProperty(const Array<String>& keys);
 
 		/// @brief ルームプロパティを取得します。存在しないキーに対しては空の文字列を返します。
 		/// @param key キー
@@ -988,7 +1007,7 @@ namespace s3d
 
 		/// @brief ルームプロパティを削除します。
 		/// @param keys キーリスト
-		void removeRoomProperties(const Array<String>& keys);
+		void removeRoomProperty(const Array<String>& keys);
 
 		/// @brief ロビーから参照可能なルームプロパティのキーリストを返します。
 		/// @return ロビーから参照可能なルームプロパティのキーリスト
@@ -1306,8 +1325,8 @@ namespace s3d
 		template<class T, class... Args>
 		using EventCallbackType = void (T::*)(LocalPlayerID, Args...);
 
-		template<class T, class... Args>
-		void RegisterEventCallback(uint8 eventCode, EventCallbackType<T, Args...> callback);
+		template<class EventCode, class T, class... Args>
+		void RegisterEventCallback(EventCode eventCode, EventCallbackType<T, Args...> callback);
 
 		template<class... Args>
 		void logger(Args&&... args) const
@@ -1384,10 +1403,81 @@ namespace s3d
 
 	template<>
 	void Multiplayer_Photon::sendEvent<>(const MultiplayerEvent& event);
-	
-	template<class T, class ...Args>
-	void Multiplayer_Photon::RegisterEventCallback(uint8 eventCode, Multiplayer_Photon::EventCallbackType<T, Args...> callback)
+
+	template<class EventCode, class T, class ...Args>
+	void Multiplayer_Photon::RegisterEventCallback(EventCode eventCode, Multiplayer_Photon::EventCallbackType<T, Args...> callback)
 	{
-		table[eventCode] = detail::CustomEventReceiver(reinterpret_cast<detail::TypeErasedCallback>(callback), &detail::WrapperImpl<T, Args...>::wrapper);
+		static_assert(std::is_integral_v<EventCode> or std::is_enum_v<EventCode>, "[Multiplayer_Photon] EventCode must be integral or enum");
+
+		if (not InRange(static_cast<int>(eventCode), 1, 199))
+		{
+			throw Error{ U"[Multiplayer_Photon] EventCode must be in a range of 1 to 199" };
+		}
+
+		table[static_cast<uint8>(eventCode)] = detail::CustomEventReceiver(reinterpret_cast<detail::TypeErasedCallback>(callback), &detail::WrapperImpl<T, Args...>::wrapper);
+	}
+
+	template<class EventCode>
+	MultiplayerEvent::MultiplayerEvent(EventCode eventCode, EventReceiverOption receiverOption, uint8 priorityIndex)
+		: m_eventCode(static_cast<uint8>(eventCode))
+		, m_receiverOption(receiverOption)
+		, m_priorityIndex(priorityIndex)
+	{
+		static_assert(std::is_integral_v<EventCode> or std::is_enum_v<EventCode>, "[Multiplayer_Photon] EventCode must be integral or enum");
+
+		if (not InRange(static_cast<int>(eventCode), 1, 199))
+		{
+			throw Error{ U"[Multiplayer_Photon] EventCode must be in a range of 1 to 199" };
+		}
+	}
+
+	template<class EventCode>
+	MultiplayerEvent::MultiplayerEvent(EventCode eventCode, Array<LocalPlayerID> targetList, uint8 priorityIndex)
+		: m_eventCode(static_cast<uint8>(eventCode))
+		, m_targetList(targetList)
+		, m_priorityIndex(priorityIndex)
+	{
+		static_assert(std::is_integral_v<EventCode> or std::is_enum_v<EventCode>, "[Multiplayer_Photon] EventCode must be integral or enum");
+
+		if (not InRange(static_cast<int>(eventCode), 1, 199))
+		{
+			throw Error{ U"[Multiplayer_Photon] EventCode must be in a range of 1 to 199" };
+		}
+	}
+
+	template<class EventCode>
+	MultiplayerEvent::MultiplayerEvent(EventCode eventCode, TargetGroup targetGroup, uint8 priorityIndex)
+		: m_eventCode(static_cast<uint8>(eventCode))
+		, m_targetGroup(targetGroup.value())
+		, m_priorityIndex(priorityIndex)
+	{
+		static_assert(std::is_integral_v<EventCode> or std::is_enum_v<EventCode>, "[Multiplayer_Photon] EventCode must be integral or enum");
+
+		if (not InRange(static_cast<int>(eventCode), 1, 199))
+		{
+			throw Error{ U"[Multiplayer_Photon] EventCode must be in a range of 1 to 199" };
+		}
+	}
+
+	template<>
+	void Multiplayer_Photon::removeEventCache(uint8 eventCode);
+
+	template<class EventCode>
+	void Multiplayer_Photon::removeEventCache(EventCode eventCode)
+	{
+		static_assert(std::is_integral_v<EventCode> or std::is_enum_v<EventCode>, "[Multiplayer_Photon] EventCode must be integral or enum");
+
+		removeEventCache(static_cast<uint8>(eventCode));
+	}
+
+	template<>
+	void Multiplayer_Photon::removeEventCache(uint8 eventCode, const Array<LocalPlayerID>& targets);
+
+	template<class EventCode>
+	void Multiplayer_Photon::removeEventCache(EventCode eventCode, const Array<LocalPlayerID>& targets)
+	{
+		static_assert(std::is_integral_v<EventCode> or std::is_enum_v<EventCode>, "[Multiplayer_Photon] EventCode must be integral or enum");
+		
+		removeEventCache(static_cast<uint8>(eventCode), targets);
 	}
 }

@@ -6489,17 +6489,17 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  1531564: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
- 1531616: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
- 1531668: () => { if (typeof(AudioContext) !== 'undefined') { return true; } else if (typeof(webkitAudioContext) !== 'undefined') { return true; } return false; },  
- 1531815: () => { if ((typeof(navigator.mediaDevices) !== 'undefined') && (typeof(navigator.mediaDevices.getUserMedia) !== 'undefined')) { return true; } else if (typeof(navigator.webkitGetUserMedia) !== 'undefined') { return true; } return false; },  
- 1532049: ($0) => { if(typeof(Module['SDL2']) === 'undefined') { Module['SDL2'] = {}; } var SDL2 = Module['SDL2']; if (!$0) { SDL2.audio = {}; } else { SDL2.capture = {}; } if (!SDL2.audioContext) { if (typeof(AudioContext) !== 'undefined') { SDL2.audioContext = new AudioContext(); } else if (typeof(webkitAudioContext) !== 'undefined') { SDL2.audioContext = new webkitAudioContext(); } if (SDL2.audioContext) { autoResumeAudioContext(SDL2.audioContext); } } return SDL2.audioContext === undefined ? -1 : 0; },  
- 1532542: () => { var SDL2 = Module['SDL2']; return SDL2.audioContext.sampleRate; },  
- 1532610: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; var have_microphone = function(stream) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); SDL2.capture.silenceTimer = undefined; } SDL2.capture.mediaStreamNode = SDL2.audioContext.createMediaStreamSource(stream); SDL2.capture.scriptProcessorNode = SDL2.audioContext.createScriptProcessor($1, $0, 1); SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) { if ((SDL2 === undefined) || (SDL2.capture === undefined)) { return; } audioProcessingEvent.outputBuffer.getChannelData(0).fill(0.0); SDL2.capture.currentCaptureBuffer = audioProcessingEvent.inputBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.mediaStreamNode.connect(SDL2.capture.scriptProcessorNode); SDL2.capture.scriptProcessorNode.connect(SDL2.audioContext.destination); SDL2.capture.stream = stream; }; var no_microphone = function(error) { }; SDL2.capture.silenceBuffer = SDL2.audioContext.createBuffer($0, $1, SDL2.audioContext.sampleRate); SDL2.capture.silenceBuffer.getChannelData(0).fill(0.0); var silence_callback = function() { SDL2.capture.currentCaptureBuffer = SDL2.capture.silenceBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.silenceTimer = setTimeout(silence_callback, ($1 / SDL2.audioContext.sampleRate) * 1000); if ((navigator.mediaDevices !== undefined) && (navigator.mediaDevices.getUserMedia !== undefined)) { navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(have_microphone).catch(no_microphone); } else if (navigator.webkitGetUserMedia !== undefined) { navigator.webkitGetUserMedia({ audio: true, video: false }, have_microphone, no_microphone); } },  
- 1534262: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; SDL2.audio.scriptProcessorNode = SDL2.audioContext['createScriptProcessor']($1, 0, $0); SDL2.audio.scriptProcessorNode['onaudioprocess'] = function (e) { if ((SDL2 === undefined) || (SDL2.audio === undefined)) { return; } SDL2.audio.currentOutputBuffer = e['outputBuffer']; dynCall('vi', $2, [$3]); }; SDL2.audio.scriptProcessorNode['connect'](SDL2.audioContext['destination']); },  
- 1534672: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.capture.currentCaptureBuffer.getChannelData(c); if (channelData.length != $1) { throw 'Web Audio capture buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } if (numChannels == 1) { for (var j = 0; j < $1; ++j) { setValue($0 + (j * 4), channelData[j], 'float'); } } else { for (var j = 0; j < $1; ++j) { setValue($0 + (((j * numChannels) + c) * 4), channelData[j], 'float'); } } } },  
- 1535277: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.audio.currentOutputBuffer['numberOfChannels']; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.audio.currentOutputBuffer['getChannelData'](c); if (channelData.length != $1) { throw 'Web Audio output buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } for (var j = 0; j < $1; ++j) { channelData[j] = HEAPF32[$0 + ((j*numChannels + c) << 2) >> 2]; } } },  
- 1535757: ($0) => { var SDL2 = Module['SDL2']; if ($0) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); } if (SDL2.capture.stream !== undefined) { var tracks = SDL2.capture.stream.getAudioTracks(); for (var i = 0; i < tracks.length; i++) { SDL2.capture.stream.removeTrack(tracks[i]); } SDL2.capture.stream = undefined; } if (SDL2.capture.scriptProcessorNode !== undefined) { SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) {}; SDL2.capture.scriptProcessorNode.disconnect(); SDL2.capture.scriptProcessorNode = undefined; } if (SDL2.capture.mediaStreamNode !== undefined) { SDL2.capture.mediaStreamNode.disconnect(); SDL2.capture.mediaStreamNode = undefined; } if (SDL2.capture.silenceBuffer !== undefined) { SDL2.capture.silenceBuffer = undefined } SDL2.capture = undefined; } else { if (SDL2.audio.scriptProcessorNode != undefined) { SDL2.audio.scriptProcessorNode.disconnect(); SDL2.audio.scriptProcessorNode = undefined; } SDL2.audio = undefined; } if ((SDL2.audioContext !== undefined) && (SDL2.audio === undefined) && (SDL2.capture === undefined)) { SDL2.audioContext.close(); SDL2.audioContext = undefined; } }
+  1535852: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
+ 1535904: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
+ 1535956: () => { if (typeof(AudioContext) !== 'undefined') { return true; } else if (typeof(webkitAudioContext) !== 'undefined') { return true; } return false; },  
+ 1536103: () => { if ((typeof(navigator.mediaDevices) !== 'undefined') && (typeof(navigator.mediaDevices.getUserMedia) !== 'undefined')) { return true; } else if (typeof(navigator.webkitGetUserMedia) !== 'undefined') { return true; } return false; },  
+ 1536337: ($0) => { if(typeof(Module['SDL2']) === 'undefined') { Module['SDL2'] = {}; } var SDL2 = Module['SDL2']; if (!$0) { SDL2.audio = {}; } else { SDL2.capture = {}; } if (!SDL2.audioContext) { if (typeof(AudioContext) !== 'undefined') { SDL2.audioContext = new AudioContext(); } else if (typeof(webkitAudioContext) !== 'undefined') { SDL2.audioContext = new webkitAudioContext(); } if (SDL2.audioContext) { autoResumeAudioContext(SDL2.audioContext); } } return SDL2.audioContext === undefined ? -1 : 0; },  
+ 1536830: () => { var SDL2 = Module['SDL2']; return SDL2.audioContext.sampleRate; },  
+ 1536898: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; var have_microphone = function(stream) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); SDL2.capture.silenceTimer = undefined; } SDL2.capture.mediaStreamNode = SDL2.audioContext.createMediaStreamSource(stream); SDL2.capture.scriptProcessorNode = SDL2.audioContext.createScriptProcessor($1, $0, 1); SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) { if ((SDL2 === undefined) || (SDL2.capture === undefined)) { return; } audioProcessingEvent.outputBuffer.getChannelData(0).fill(0.0); SDL2.capture.currentCaptureBuffer = audioProcessingEvent.inputBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.mediaStreamNode.connect(SDL2.capture.scriptProcessorNode); SDL2.capture.scriptProcessorNode.connect(SDL2.audioContext.destination); SDL2.capture.stream = stream; }; var no_microphone = function(error) { }; SDL2.capture.silenceBuffer = SDL2.audioContext.createBuffer($0, $1, SDL2.audioContext.sampleRate); SDL2.capture.silenceBuffer.getChannelData(0).fill(0.0); var silence_callback = function() { SDL2.capture.currentCaptureBuffer = SDL2.capture.silenceBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.silenceTimer = setTimeout(silence_callback, ($1 / SDL2.audioContext.sampleRate) * 1000); if ((navigator.mediaDevices !== undefined) && (navigator.mediaDevices.getUserMedia !== undefined)) { navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(have_microphone).catch(no_microphone); } else if (navigator.webkitGetUserMedia !== undefined) { navigator.webkitGetUserMedia({ audio: true, video: false }, have_microphone, no_microphone); } },  
+ 1538550: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; SDL2.audio.scriptProcessorNode = SDL2.audioContext['createScriptProcessor']($1, 0, $0); SDL2.audio.scriptProcessorNode['onaudioprocess'] = function (e) { if ((SDL2 === undefined) || (SDL2.audio === undefined)) { return; } SDL2.audio.currentOutputBuffer = e['outputBuffer']; dynCall('vi', $2, [$3]); }; SDL2.audio.scriptProcessorNode['connect'](SDL2.audioContext['destination']); },  
+ 1538960: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.capture.currentCaptureBuffer.getChannelData(c); if (channelData.length != $1) { throw 'Web Audio capture buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } if (numChannels == 1) { for (var j = 0; j < $1; ++j) { setValue($0 + (j * 4), channelData[j], 'float'); } } else { for (var j = 0; j < $1; ++j) { setValue($0 + (((j * numChannels) + c) * 4), channelData[j], 'float'); } } } },  
+ 1539565: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.audio.currentOutputBuffer['numberOfChannels']; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.audio.currentOutputBuffer['getChannelData'](c); if (channelData.length != $1) { throw 'Web Audio output buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } for (var j = 0; j < $1; ++j) { channelData[j] = HEAPF32[$0 + ((j*numChannels + c) << 2) >> 2]; } } },  
+ 1540045: ($0) => { var SDL2 = Module['SDL2']; if ($0) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); } if (SDL2.capture.stream !== undefined) { var tracks = SDL2.capture.stream.getAudioTracks(); for (var i = 0; i < tracks.length; i++) { SDL2.capture.stream.removeTrack(tracks[i]); } SDL2.capture.stream = undefined; } if (SDL2.capture.scriptProcessorNode !== undefined) { SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) {}; SDL2.capture.scriptProcessorNode.disconnect(); SDL2.capture.scriptProcessorNode = undefined; } if (SDL2.capture.mediaStreamNode !== undefined) { SDL2.capture.mediaStreamNode.disconnect(); SDL2.capture.mediaStreamNode = undefined; } if (SDL2.capture.silenceBuffer !== undefined) { SDL2.capture.silenceBuffer = undefined } SDL2.capture = undefined; } else { if (SDL2.audio.scriptProcessorNode != undefined) { SDL2.audio.scriptProcessorNode.disconnect(); SDL2.audio.scriptProcessorNode = undefined; } SDL2.audio = undefined; } if ((SDL2.audioContext !== undefined) && (SDL2.audio === undefined) && (SDL2.capture === undefined)) { SDL2.audioContext.close(); SDL2.audioContext = undefined; } }
 };
 
 
@@ -9975,16 +9975,6 @@ var ASM_CONSTS = {
   }
   }
 
-  function _getentropy(buffer, size) {
-      if (!_getentropy.randomDevice) {
-        _getentropy.randomDevice = getRandomDevice();
-      }
-      for (var i = 0; i < size; i++) {
-        HEAP8[(((buffer)+(i))>>0)] = _getentropy.randomDevice();
-      }
-      return 0;
-    }
-
   function __webgl_enable_WEBGL_draw_instanced_base_vertex_base_instance(ctx) {
       // Closure is expected to be allowed to minify the '.dibvbi' property, so not accessing it quoted.
       return !!(ctx.dibvbi = ctx.getExtension('WEBGL_draw_instanced_base_vertex_base_instance'));
@@ -12846,53 +12836,6 @@ var ASM_CONSTS = {
           return window.keysBuffer;
       }
 
-  function _glfwGetMonitorContentScale(handle, xscale, yscale) {
-          setValue(xscale, 1, 'float');
-          setValue(yscale, 1, 'float'); 
-      }
-
-  function _glfwGetMonitorInfo_Siv3D(handle, displayID, xpos, ypos, w, h) {
-          setValue(displayID, 1, 'i32');
-          setValue(xpos, 0, 'i32');
-          setValue(ypos, 0, 'i32');
-          setValue(w, window.screen.width, 'i32');
-          setValue(h, window.screen.height, 'i32');
-      }
-
-  function _glfwGetMonitorName(mon) {
-      if (!GLFW.monitorString) {
-        GLFW.monitorString = allocateUTF8("HTML5 WebGL Canvas");
-      }
-      return GLFW.monitorString;
-    }
-
-  function _glfwGetMonitorPhysicalSize(monitor, width, height) {
-      // AFAIK there is no way to do this in javascript
-      // Maybe with platform specific ccalls?
-      //
-      // Lets report 0 now which is wrong as it can get for end user.
-      HEAP32[((width)>>2)] = 0;
-      HEAP32[((height)>>2)] = 0;
-    }
-
-  function _glfwGetMonitorWorkarea(handle, wx, wy, ww, wh) {
-          setValue(wx, 0, 'i32');
-          setValue(wy, 0, 'i32');
-          setValue(ww, window.screen.availWidth, 'i32');
-          setValue(wh, window.screen.availHeight, 'i32');
-      }
-
-  function _glfwGetMonitors(count) {
-      HEAP32[((count)>>2)] = 1;
-      if (!GLFW.monitors) {
-        GLFW.monitors = _malloc(4);
-        HEAP32[((GLFW.monitors)>>2)] = 1;
-      }
-      return GLFW.monitors;
-    }
-
-  function _glfwGetVideoMode(monitor) { return 0; }
-
   function _glfwGetWindowAttrib(winid, attrib) {
       var win = GLFW.WindowFromId(winid);
       if (!win) return 0;
@@ -14819,6 +14762,18 @@ var ASM_CONSTS = {
           }
       }
 
+  var siv3dTextInputElement = null;
+  function _siv3dGetTextInputCursor() {
+          const selection = window.getSelection();
+          const targetTextNode = siv3dTextInputElement.childNodes[0];
+  
+          if (selection.focusNode == targetTextNode) {
+              return selection.focusOffset;
+          } else {
+              return 0;
+          }
+      }
+
   function _siv3dGetXMLHTTPRequestResponseHeaders(id) {
           const http = siv3dXMLHTTPRequestList[id];
           const responseHeaders = http.getAllResponseHeaders();
@@ -14838,7 +14793,6 @@ var ASM_CONSTS = {
           siv3dDownloadLink = document.createElement("a");
       }
 
-  var siv3dTextInputElement = null;
   function _siv3dInitTextInput() {
           const textInput = document.createElement("div");
           textInput.id = "textinput";
@@ -15012,11 +14966,44 @@ var ASM_CONSTS = {
           if (isOpen_ptr != 0) setValue(isOpen_ptr, room.isOpen, "i8");
       }
 
-  function _siv3dPhotonGetPlayerCustomProperties(ptr) {
-          const obj = siv3dPhotonClient.myActor().getCustomProperties();
+  function _siv3dPhotonGetMasterClientID() {
+          return siv3dPhotonClient.myRoomMasterActorNr();
+      }
+
+  function _siv3dPhotonGetPlayerCustomProperties(ptr, actorNr) {
+          const actor = actorNr < 0 ? siv3dPhotonClient.myActor() : siv3dPhotonClient.myRoomActors()[actorNr];
+          const obj = actor.getCustomProperties();
           for (key in obj) {
               _siv3dPhotonGetCustomPropertiesCallback(ptr, siv3dStringToNewUTF32(key), siv3dStringToNewUTF32(obj[key]));
           }
+      }
+
+  function UTF32ToString(ptr, maxBytesToRead) {
+      assert(ptr % 4 == 0, 'Pointer passed to UTF32ToString must be aligned to four bytes!');
+      var i = 0;
+  
+      var str = '';
+      // If maxBytesToRead is not passed explicitly, it will be undefined, and this
+      // will always evaluate to true. This saves on code size.
+      while (!(i >= maxBytesToRead / 4)) {
+        var utf32 = HEAP32[(((ptr)+(i*4))>>2)];
+        if (utf32 == 0) break;
+        ++i;
+        // Gotcha: fromCharCode constructs a character from a UTF-16 encoded code (pair), not from a Unicode code point! So encode the code point to UTF-16 for constructing.
+        // See http://unicode.org/faq/utf_bom.html#utf16-3
+        if (utf32 >= 0x10000) {
+          var ch = utf32 - 0x10000;
+          str += String.fromCharCode(0xD800 | (ch >> 10), 0xDC00 | (ch & 0x3FF));
+        } else {
+          str += String.fromCharCode(utf32);
+        }
+      }
+      return str;
+    }
+  function _siv3dPhotonGetPlayerCustomProperty(key_ptr, actorNr) {
+          const actor = actorNr < 0 ? siv3dPhotonClient.myActor() : siv3dPhotonClient.myRoomActors()[actorNr];
+          const found = actor.getCustomProperty(UTF32ToString(key_ptr));
+          return found ? siv3dStringToNewUTF32(found) : 0;
       }
 
   function _siv3dPhotonGetRoomCustomProperties(ptr) {
@@ -15053,6 +15040,21 @@ var ASM_CONSTS = {
               if (filter >= 0 && filter != actorNr) continue;
               const actor = actors[actorNr];
               _siv3dPhotonGetRoomPlayerListCallback(ptr, actorNr, siv3dStringToNewUTF32(actor.name), siv3dStringToNewUTF32(actor.userId), siv3dPhotonClient.myRoomMasterActorNr() == actorNr, !actor.isSuspended);
+          }
+      }
+
+  function _siv3dPhotonGetRoundTripTime() {
+          return siv3dPhotonClient.getRtt();
+      }
+
+  function _siv3dPhotonGetServerTime() {
+          return siv3dPhotonClient.getServerTimeMs();
+      }
+
+  function _siv3dPhotonGetVisibleRoomPropertyKeys(ptr) {
+          const obj = siv3dPhotonClient.myRoom().getPropsListedInLobby();
+          for (let prop of obj) {
+              _siv3dPhotonGetVisibleRoomPropertyKeysCallback(ptr, siv3dStringToNewUTF32(prop));
           }
       }
 
@@ -15186,28 +15188,28 @@ var ASM_CONSTS = {
           return siv3dPhotonClient.isJoinedToRoom();
       }
 
-  function UTF32ToString(ptr, maxBytesToRead) {
-      assert(ptr % 4 == 0, 'Pointer passed to UTF32ToString must be aligned to four bytes!');
-      var i = 0;
+  function _siv3dPhotonJoinRandomOrCreateRoom(roomName_ptr, opt_ptr, maxPlayers, matchmakingMode, filter_ptr) {
+          if (siv3dPhotonClient.waitingCallback) {
+              return false;
+          }
   
-      var str = '';
-      // If maxBytesToRead is not passed explicitly, it will be undefined, and this
-      // will always evaluate to true. This saves on code size.
-      while (!(i >= maxBytesToRead / 4)) {
-        var utf32 = HEAP32[(((ptr)+(i*4))>>2)];
-        if (utf32 == 0) break;
-        ++i;
-        // Gotcha: fromCharCode constructs a character from a UTF-16 encoded code (pair), not from a Unicode code point! So encode the code point to UTF-16 for constructing.
-        // See http://unicode.org/faq/utf_bom.html#utf16-3
-        if (utf32 >= 0x10000) {
-          var ch = utf32 - 0x10000;
-          str += String.fromCharCode(0xD800 | (ch >> 10), 0xDC00 | (ch & 0x3FF));
-        } else {
-          str += String.fromCharCode(utf32);
-        }
+          const result = siv3dPhotonClient.joinRandomOrCreateRoom(
+              {
+                  expectedMaxPlayers: maxPlayers,
+                  matchmakingMode: matchmakingMode,
+                  expectedCustomRoomProperties: filter_ptr ? JSON.parse(UTF32ToString(filter_ptr)) : null,
+              },
+              UTF32ToString(roomName_ptr),
+              opt_ptr ? JSON.parse(UTF32ToString(opt_ptr)) : null,
+          );
+  
+          if (result) {
+              siv3dPhotonClient.waitingCallback = siv3dPhotonCallbackCode.JoinRandomOrCreateRoomReturn;
+          }
+  
+          return result;
       }
-      return str;
-    }
+
   function _siv3dPhotonJoinRandomRoom(maxPlayers, matchmakingMode, filter_ptr) {
           if (siv3dPhotonClient.waitingCallback) {
               return false;
@@ -15408,8 +15410,20 @@ var ASM_CONSTS = {
           }
       }
 
+  function _siv3dPhotonSetCurrentRoomOpen(isOpen) {
+          siv3dPhotonClient.myActor().getRoom().isOpen = isOpen;
+      }
+
+  function _siv3dPhotonSetCurrentRoomVisible(isVisible) {
+          siv3dPhotonClient.myActor().getRoom().isVisible = isVisible;
+      }
+
   function _siv3dPhotonSetMasterClient(localPlayerID) {
           siv3dPhotonClient.myActor().getRoom().setMasterClient(localPlayerID);
+      }
+
+  function _siv3dPhotonSetPlayerCustomProperty(key_ptr, value_ptr) {
+          siv3dPhotonClient.myActor().setCustomProperty(UTF32ToString(key_ptr), UTF32ToString(value_ptr));
       }
 
   function _siv3dPhotonSetRoomCustomProperty(key_ptr, value_ptr) {
@@ -15705,6 +15719,30 @@ var ASM_CONSTS = {
   function _siv3dSetCursorStyle(style) {
           const styleText = UTF8ToString(style);
           Module["canvas"]["style"]["cursor"] = styleText;
+      }
+
+  function _siv3dSetTextInputCursor(index) {
+          const targetTextNode = siv3dTextInputElement.childNodes[0];
+  
+          if (!targetTextNode) {
+              return;
+          }
+  
+          const selection = window.getSelection();
+          const range = document.createRange();
+  
+          range.selectNode(targetTextNode);
+          range.setStart(targetTextNode, index);
+          range.setEnd(targetTextNode, index);
+  
+          selection.removeAllRanges();
+          selection.addRange(range);
+      }
+
+  function _siv3dSetTextInputText(ptr) {
+          /** @type { string } */
+          const newText = UTF8ToString(ptr);
+          siv3dTextInputElement.textContent = " ".repeat([...newText].length);
       }
 
   function _siv3dSetXMLHTTPRequestCallback(id, fnPtr, userDataPtr) {
@@ -16888,7 +16926,6 @@ var asmLibraryArg = {
   "fd_read": _fd_read,
   "fd_seek": _fd_seek,
   "fd_write": _fd_write,
-  "getentropy": _getentropy,
   "glActiveTexture": _glActiveTexture,
   "glAttachShader": _glAttachShader,
   "glBindBuffer": _glBindBuffer,
@@ -16972,13 +17009,6 @@ var asmLibraryArg = {
   "glfwGetJoystickButtons": _glfwGetJoystickButtons,
   "glfwGetJoystickHats": _glfwGetJoystickHats,
   "glfwGetKeysSiv3D": _glfwGetKeysSiv3D,
-  "glfwGetMonitorContentScale": _glfwGetMonitorContentScale,
-  "glfwGetMonitorInfo_Siv3D": _glfwGetMonitorInfo_Siv3D,
-  "glfwGetMonitorName": _glfwGetMonitorName,
-  "glfwGetMonitorPhysicalSize": _glfwGetMonitorPhysicalSize,
-  "glfwGetMonitorWorkarea": _glfwGetMonitorWorkarea,
-  "glfwGetMonitors": _glfwGetMonitors,
-  "glfwGetVideoMode": _glfwGetVideoMode,
   "glfwGetWindowAttrib": _glfwGetWindowAttrib,
   "glfwGetWindowPos": _glfwGetWindowPos,
   "glfwGetWindowSize": _glfwGetWindowSize,
@@ -17116,6 +17146,7 @@ var asmLibraryArg = {
   "siv3dGetJoystickInfo": _siv3dGetJoystickInfo,
   "siv3dGetPrimaryTouchPoint": _siv3dGetPrimaryTouchPoint,
   "siv3dGetTextInputCompositionRange": _siv3dGetTextInputCompositionRange,
+  "siv3dGetTextInputCursor": _siv3dGetTextInputCursor,
   "siv3dGetXMLHTTPRequestResponseHeaders": _siv3dGetXMLHTTPRequestResponseHeaders,
   "siv3dInitDialog": _siv3dInitDialog,
   "siv3dInitTextInput": _siv3dInitTextInput,
@@ -17129,15 +17160,21 @@ var asmLibraryArg = {
   "siv3dPhotonCreateRoom": _siv3dPhotonCreateRoom,
   "siv3dPhotonDisconnect": _siv3dPhotonDisconnect,
   "siv3dPhotonGetCurrentRoom": _siv3dPhotonGetCurrentRoom,
+  "siv3dPhotonGetMasterClientID": _siv3dPhotonGetMasterClientID,
   "siv3dPhotonGetPlayerCustomProperties": _siv3dPhotonGetPlayerCustomProperties,
+  "siv3dPhotonGetPlayerCustomProperty": _siv3dPhotonGetPlayerCustomProperty,
   "siv3dPhotonGetRoomCustomProperties": _siv3dPhotonGetRoomCustomProperties,
   "siv3dPhotonGetRoomList": _siv3dPhotonGetRoomList,
   "siv3dPhotonGetRoomNameList": _siv3dPhotonGetRoomNameList,
   "siv3dPhotonGetRoomPlayerIDList": _siv3dPhotonGetRoomPlayerIDList,
   "siv3dPhotonGetRoomPlayerList": _siv3dPhotonGetRoomPlayerList,
+  "siv3dPhotonGetRoundTripTime": _siv3dPhotonGetRoundTripTime,
+  "siv3dPhotonGetServerTime": _siv3dPhotonGetServerTime,
+  "siv3dPhotonGetVisibleRoomPropertyKeys": _siv3dPhotonGetVisibleRoomPropertyKeys,
   "siv3dPhotonInitClient": _siv3dPhotonInitClient,
   "siv3dPhotonIsInLobby": _siv3dPhotonIsInLobby,
   "siv3dPhotonIsJoinedToRoom": _siv3dPhotonIsJoinedToRoom,
+  "siv3dPhotonJoinRandomOrCreateRoom": _siv3dPhotonJoinRandomOrCreateRoom,
   "siv3dPhotonJoinRandomRoom": _siv3dPhotonJoinRandomRoom,
   "siv3dPhotonJoinRoom": _siv3dPhotonJoinRoom,
   "siv3dPhotonLeaveRoom": _siv3dPhotonLeaveRoom,
@@ -17146,7 +17183,10 @@ var asmLibraryArg = {
   "siv3dPhotonRemovePlayerCustomProperties": _siv3dPhotonRemovePlayerCustomProperties,
   "siv3dPhotonRemoveRoomCustomProperties": _siv3dPhotonRemoveRoomCustomProperties,
   "siv3dPhotonService": _siv3dPhotonService,
+  "siv3dPhotonSetCurrentRoomOpen": _siv3dPhotonSetCurrentRoomOpen,
+  "siv3dPhotonSetCurrentRoomVisible": _siv3dPhotonSetCurrentRoomVisible,
   "siv3dPhotonSetMasterClient": _siv3dPhotonSetMasterClient,
+  "siv3dPhotonSetPlayerCustomProperty": _siv3dPhotonSetPlayerCustomProperty,
   "siv3dPhotonSetRoomCustomProperty": _siv3dPhotonSetRoomCustomProperty,
   "siv3dPhotonSetUserName": _siv3dPhotonSetUserName,
   "siv3dPhotonUpdateLocalPlayer": _siv3dPhotonUpdateLocalPlayer,
@@ -17167,6 +17207,8 @@ var asmLibraryArg = {
   "siv3dSendXMLHTTPRequest": _siv3dSendXMLHTTPRequest,
   "siv3dSetClipboardText": _siv3dSetClipboardText,
   "siv3dSetCursorStyle": _siv3dSetCursorStyle,
+  "siv3dSetTextInputCursor": _siv3dSetTextInputCursor,
+  "siv3dSetTextInputText": _siv3dSetTextInputText,
   "siv3dSetXMLHTTPRequestCallback": _siv3dSetXMLHTTPRequestCallback,
   "siv3dSetXMLHTTPRequestErrorCallback": _siv3dSetXMLHTTPRequestErrorCallback,
   "siv3dSetXMLHTTPRequestProgressCallback": _siv3dSetXMLHTTPRequestProgressCallback,
@@ -17320,22 +17362,22 @@ var ___cxa_can_catch = Module["___cxa_can_catch"] = createExportWrapper("__cxa_c
 var ___cxa_is_pointer_type = Module["___cxa_is_pointer_type"] = createExportWrapper("__cxa_is_pointer_type");
 
 /** @type {function(...*):?} */
-var dynCall_vi = Module["dynCall_vi"] = createExportWrapper("dynCall_vi");
-
-/** @type {function(...*):?} */
-var dynCall_viiiii = Module["dynCall_viiiii"] = createExportWrapper("dynCall_viiiii");
-
-/** @type {function(...*):?} */
-var dynCall_viiii = Module["dynCall_viiii"] = createExportWrapper("dynCall_viiii");
-
-/** @type {function(...*):?} */
 var dynCall_viii = Module["dynCall_viii"] = createExportWrapper("dynCall_viii");
+
+/** @type {function(...*):?} */
+var dynCall_vii = Module["dynCall_vii"] = createExportWrapper("dynCall_vii");
 
 /** @type {function(...*):?} */
 var dynCall_ii = Module["dynCall_ii"] = createExportWrapper("dynCall_ii");
 
 /** @type {function(...*):?} */
-var dynCall_vii = Module["dynCall_vii"] = createExportWrapper("dynCall_vii");
+var dynCall_vi = Module["dynCall_vi"] = createExportWrapper("dynCall_vi");
+
+/** @type {function(...*):?} */
+var dynCall_viiii = Module["dynCall_viiii"] = createExportWrapper("dynCall_viiii");
+
+/** @type {function(...*):?} */
+var dynCall_viiiii = Module["dynCall_viiiii"] = createExportWrapper("dynCall_viiiii");
 
 /** @type {function(...*):?} */
 var dynCall_iii = Module["dynCall_iii"] = createExportWrapper("dynCall_iii");
@@ -17903,6 +17945,17 @@ function invoke_iiiiiii(index,a1,a2,a3,a4,a5,a6) {
   }
 }
 
+function invoke_viiiii(index,a1,a2,a3,a4,a5) {
+  var sp = stackSave();
+  try {
+    dynCall_viiiii(index,a1,a2,a3,a4,a5);
+  } catch(e) {
+    stackRestore(sp);
+    if (e !== e+0) throw e;
+    _setThrew(1, 0);
+  }
+}
+
 function invoke_iiiiiiii(index,a1,a2,a3,a4,a5,a6,a7) {
   var sp = stackSave();
   try {
@@ -18017,17 +18070,6 @@ function invoke_iiffff(index,a1,a2,a3,a4,a5) {
   var sp = stackSave();
   try {
     return dynCall_iiffff(index,a1,a2,a3,a4,a5);
-  } catch(e) {
-    stackRestore(sp);
-    if (e !== e+0) throw e;
-    _setThrew(1, 0);
-  }
-}
-
-function invoke_viiiii(index,a1,a2,a3,a4,a5) {
-  var sp = stackSave();
-  try {
-    dynCall_viiiii(index,a1,a2,a3,a4,a5);
   } catch(e) {
     stackRestore(sp);
     if (e !== e+0) throw e;

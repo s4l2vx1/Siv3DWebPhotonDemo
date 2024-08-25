@@ -545,20 +545,22 @@ mergeInto(LibraryManager.library, {
     siv3dPhotonSetMasterClient__sig: "vi",
     siv3dPhotonSetMasterClient__deps: ["$siv3dPhotonClient"],
 
-    siv3dPhotonGetPlayerCustomProperty: function (key_ptr) {
-        const found = siv3dPhotonClient.myActor().getCustomProperty(UTF32ToString(key_ptr));
+    siv3dPhotonGetPlayerCustomProperty: function (key_ptr, actorNr) {
+        const actor = actorNr < 0 ? siv3dPhotonClient.myActor() : siv3dPhotonClient.myRoomActors()[actorNr];
+        const found = actor.getCustomProperty(UTF32ToString(key_ptr));
         return found ? siv3dStringToNewUTF32(found) : 0;
     },
-    siv3dPhotonGetPlayerCustomProperty__sig: "ii",
+    siv3dPhotonGetPlayerCustomProperty__sig: "iii",
     siv3dPhotonGetPlayerCustomProperty__deps: ["$siv3dPhotonClient", "$siv3dStringToNewUTF32", "$UTF32ToString"],
 
-    siv3dPhotonGetPlayerCustomProperties: function (ptr) {
-        const obj = siv3dPhotonClient.myActor().getCustomProperties();
+    siv3dPhotonGetPlayerCustomProperties: function (ptr, actorNr) {
+        const actor = actorNr < 0 ? siv3dPhotonClient.myActor() : siv3dPhotonClient.myRoomActors()[actorNr];
+        const obj = actor.getCustomProperties();
         for (key in obj) {
             _siv3dPhotonGetCustomPropertiesCallback(ptr, siv3dStringToNewUTF32(key), siv3dStringToNewUTF32(obj[key]));
         }
     },
-    siv3dPhotonGetPlayerCustomProperties__sig: "vi",
+    siv3dPhotonGetPlayerCustomProperties__sig: "vii",
     siv3dPhotonGetPlayerCustomProperties__deps: ["$siv3dPhotonClient", "$siv3dStringToNewUTF32", "siv3dPhotonGetCustomPropertiesCallback"],
 
     siv3dPhotonSetPlayerCustomProperty: function (key_ptr, value_ptr) {
