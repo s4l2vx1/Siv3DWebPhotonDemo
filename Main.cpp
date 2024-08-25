@@ -199,7 +199,7 @@ public:
 
 	MyNetwork()
 	{
-		init(std::string(SIV3D_OBFUSCATE(PHOTON_APP_ID)), U"1.0", Console, Verbose::Yes, ConnectionProtocol::Default);
+		init(std::string(SIV3D_OBFUSCATE(PHOTON_APP_ID)), U"1.0", Console, Verbose::Yes, ConnectionProtocol::Wss);
 
 		RegisterEventCallback(EventCode::IntEvent, &MyNetwork::onIntEvent);
 		RegisterEventCallback(EventCode::StringEvent, &MyNetwork::onStringEvent);
