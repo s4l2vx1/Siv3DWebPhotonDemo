@@ -1356,7 +1356,7 @@ namespace s3d
 
 		String m_lastJoinedRoomName;
 	# else
-		std::shared_ptr<PhotonDetail> m_detail;
+		std::unique_ptr<PhotonDetail> m_detail;
 	# endif
 
 		String m_secretPhotonAppID;

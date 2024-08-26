@@ -33,7 +33,7 @@ Module['ready'] = new Promise(function(resolve, reject) {
   readyPromiseResolve = resolve;
   readyPromiseReject = reject;
 });
-["_main","_siv3dPhotonGetRoomListCallback","_siv3dPhotonGetRoomNameListCallback","_siv3dPhotonGetRoomPlayerListCallback","_siv3dPhotonGetRoomPlayerIDListCallback","_siv3dPhotonGeneralCallback","_siv3dPhotonAppStateChangeCallback","_siv3dPhotonActorJoinCallback","_siv3dPhotonActorLeaveCallback","_siv3dPhotonCustomEventCallback","_siv3dPhotonGetCustomPropertiesCallback","_siv3dPhotonGetVisibleRoomPropertyKeysCallback","_siv3dPhotonOnRoomListUpdateCallback","_siv3dPhotonOnRoomPropertiesChangeCallback","_siv3dPhotonOnPlayerPropertiesChangeCallback","_siv3dPhotonOnHostChangeCallback","_siv3dThrowException","_fflush","onRuntimeInitialized"].forEach((prop) => {
+["_main","_siv3dPhotonGetRoomListCallback","_siv3dPhotonGetRoomNameListCallback","_siv3dPhotonGetRoomPlayerListCallback","_siv3dPhotonGetRoomPlayerIDListCallback","_siv3dPhotonGeneralCallback","_siv3dPhotonClientStateChangeCallback","_siv3dPhotonAppStateChangeCallback","_siv3dPhotonActorJoinCallback","_siv3dPhotonActorLeaveCallback","_siv3dPhotonCustomEventCallback","_siv3dPhotonGetCustomPropertiesCallback","_siv3dPhotonGetVisibleRoomPropertyKeysCallback","_siv3dPhotonOnRoomListUpdateCallback","_siv3dPhotonOnRoomPropertiesChangeCallback","_siv3dPhotonOnPlayerPropertiesChangeCallback","_siv3dPhotonOnHostChangeCallback","_siv3dThrowException","_fflush","onRuntimeInitialized"].forEach((prop) => {
   if (!Object.getOwnPropertyDescriptor(Module['ready'], prop)) {
     Object.defineProperty(Module['ready'], prop, {
       get: () => abort('You are getting ' + prop + ' on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js'),
@@ -6489,17 +6489,17 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  1535852: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
- 1535904: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
- 1535956: () => { if (typeof(AudioContext) !== 'undefined') { return true; } else if (typeof(webkitAudioContext) !== 'undefined') { return true; } return false; },  
- 1536103: () => { if ((typeof(navigator.mediaDevices) !== 'undefined') && (typeof(navigator.mediaDevices.getUserMedia) !== 'undefined')) { return true; } else if (typeof(navigator.webkitGetUserMedia) !== 'undefined') { return true; } return false; },  
- 1536337: ($0) => { if(typeof(Module['SDL2']) === 'undefined') { Module['SDL2'] = {}; } var SDL2 = Module['SDL2']; if (!$0) { SDL2.audio = {}; } else { SDL2.capture = {}; } if (!SDL2.audioContext) { if (typeof(AudioContext) !== 'undefined') { SDL2.audioContext = new AudioContext(); } else if (typeof(webkitAudioContext) !== 'undefined') { SDL2.audioContext = new webkitAudioContext(); } if (SDL2.audioContext) { autoResumeAudioContext(SDL2.audioContext); } } return SDL2.audioContext === undefined ? -1 : 0; },  
- 1536830: () => { var SDL2 = Module['SDL2']; return SDL2.audioContext.sampleRate; },  
- 1536898: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; var have_microphone = function(stream) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); SDL2.capture.silenceTimer = undefined; } SDL2.capture.mediaStreamNode = SDL2.audioContext.createMediaStreamSource(stream); SDL2.capture.scriptProcessorNode = SDL2.audioContext.createScriptProcessor($1, $0, 1); SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) { if ((SDL2 === undefined) || (SDL2.capture === undefined)) { return; } audioProcessingEvent.outputBuffer.getChannelData(0).fill(0.0); SDL2.capture.currentCaptureBuffer = audioProcessingEvent.inputBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.mediaStreamNode.connect(SDL2.capture.scriptProcessorNode); SDL2.capture.scriptProcessorNode.connect(SDL2.audioContext.destination); SDL2.capture.stream = stream; }; var no_microphone = function(error) { }; SDL2.capture.silenceBuffer = SDL2.audioContext.createBuffer($0, $1, SDL2.audioContext.sampleRate); SDL2.capture.silenceBuffer.getChannelData(0).fill(0.0); var silence_callback = function() { SDL2.capture.currentCaptureBuffer = SDL2.capture.silenceBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.silenceTimer = setTimeout(silence_callback, ($1 / SDL2.audioContext.sampleRate) * 1000); if ((navigator.mediaDevices !== undefined) && (navigator.mediaDevices.getUserMedia !== undefined)) { navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(have_microphone).catch(no_microphone); } else if (navigator.webkitGetUserMedia !== undefined) { navigator.webkitGetUserMedia({ audio: true, video: false }, have_microphone, no_microphone); } },  
- 1538550: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; SDL2.audio.scriptProcessorNode = SDL2.audioContext['createScriptProcessor']($1, 0, $0); SDL2.audio.scriptProcessorNode['onaudioprocess'] = function (e) { if ((SDL2 === undefined) || (SDL2.audio === undefined)) { return; } SDL2.audio.currentOutputBuffer = e['outputBuffer']; dynCall('vi', $2, [$3]); }; SDL2.audio.scriptProcessorNode['connect'](SDL2.audioContext['destination']); },  
- 1538960: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.capture.currentCaptureBuffer.getChannelData(c); if (channelData.length != $1) { throw 'Web Audio capture buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } if (numChannels == 1) { for (var j = 0; j < $1; ++j) { setValue($0 + (j * 4), channelData[j], 'float'); } } else { for (var j = 0; j < $1; ++j) { setValue($0 + (((j * numChannels) + c) * 4), channelData[j], 'float'); } } } },  
- 1539565: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.audio.currentOutputBuffer['numberOfChannels']; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.audio.currentOutputBuffer['getChannelData'](c); if (channelData.length != $1) { throw 'Web Audio output buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } for (var j = 0; j < $1; ++j) { channelData[j] = HEAPF32[$0 + ((j*numChannels + c) << 2) >> 2]; } } },  
- 1540045: ($0) => { var SDL2 = Module['SDL2']; if ($0) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); } if (SDL2.capture.stream !== undefined) { var tracks = SDL2.capture.stream.getAudioTracks(); for (var i = 0; i < tracks.length; i++) { SDL2.capture.stream.removeTrack(tracks[i]); } SDL2.capture.stream = undefined; } if (SDL2.capture.scriptProcessorNode !== undefined) { SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) {}; SDL2.capture.scriptProcessorNode.disconnect(); SDL2.capture.scriptProcessorNode = undefined; } if (SDL2.capture.mediaStreamNode !== undefined) { SDL2.capture.mediaStreamNode.disconnect(); SDL2.capture.mediaStreamNode = undefined; } if (SDL2.capture.silenceBuffer !== undefined) { SDL2.capture.silenceBuffer = undefined } SDL2.capture = undefined; } else { if (SDL2.audio.scriptProcessorNode != undefined) { SDL2.audio.scriptProcessorNode.disconnect(); SDL2.audio.scriptProcessorNode = undefined; } SDL2.audio = undefined; } if ((SDL2.audioContext !== undefined) && (SDL2.audio === undefined) && (SDL2.capture === undefined)) { SDL2.audioContext.close(); SDL2.audioContext = undefined; } }
+  1535964: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
+ 1536016: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
+ 1536068: () => { if (typeof(AudioContext) !== 'undefined') { return true; } else if (typeof(webkitAudioContext) !== 'undefined') { return true; } return false; },  
+ 1536215: () => { if ((typeof(navigator.mediaDevices) !== 'undefined') && (typeof(navigator.mediaDevices.getUserMedia) !== 'undefined')) { return true; } else if (typeof(navigator.webkitGetUserMedia) !== 'undefined') { return true; } return false; },  
+ 1536449: ($0) => { if(typeof(Module['SDL2']) === 'undefined') { Module['SDL2'] = {}; } var SDL2 = Module['SDL2']; if (!$0) { SDL2.audio = {}; } else { SDL2.capture = {}; } if (!SDL2.audioContext) { if (typeof(AudioContext) !== 'undefined') { SDL2.audioContext = new AudioContext(); } else if (typeof(webkitAudioContext) !== 'undefined') { SDL2.audioContext = new webkitAudioContext(); } if (SDL2.audioContext) { autoResumeAudioContext(SDL2.audioContext); } } return SDL2.audioContext === undefined ? -1 : 0; },  
+ 1536942: () => { var SDL2 = Module['SDL2']; return SDL2.audioContext.sampleRate; },  
+ 1537010: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; var have_microphone = function(stream) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); SDL2.capture.silenceTimer = undefined; } SDL2.capture.mediaStreamNode = SDL2.audioContext.createMediaStreamSource(stream); SDL2.capture.scriptProcessorNode = SDL2.audioContext.createScriptProcessor($1, $0, 1); SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) { if ((SDL2 === undefined) || (SDL2.capture === undefined)) { return; } audioProcessingEvent.outputBuffer.getChannelData(0).fill(0.0); SDL2.capture.currentCaptureBuffer = audioProcessingEvent.inputBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.mediaStreamNode.connect(SDL2.capture.scriptProcessorNode); SDL2.capture.scriptProcessorNode.connect(SDL2.audioContext.destination); SDL2.capture.stream = stream; }; var no_microphone = function(error) { }; SDL2.capture.silenceBuffer = SDL2.audioContext.createBuffer($0, $1, SDL2.audioContext.sampleRate); SDL2.capture.silenceBuffer.getChannelData(0).fill(0.0); var silence_callback = function() { SDL2.capture.currentCaptureBuffer = SDL2.capture.silenceBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.silenceTimer = setTimeout(silence_callback, ($1 / SDL2.audioContext.sampleRate) * 1000); if ((navigator.mediaDevices !== undefined) && (navigator.mediaDevices.getUserMedia !== undefined)) { navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(have_microphone).catch(no_microphone); } else if (navigator.webkitGetUserMedia !== undefined) { navigator.webkitGetUserMedia({ audio: true, video: false }, have_microphone, no_microphone); } },  
+ 1538662: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; SDL2.audio.scriptProcessorNode = SDL2.audioContext['createScriptProcessor']($1, 0, $0); SDL2.audio.scriptProcessorNode['onaudioprocess'] = function (e) { if ((SDL2 === undefined) || (SDL2.audio === undefined)) { return; } SDL2.audio.currentOutputBuffer = e['outputBuffer']; dynCall('vi', $2, [$3]); }; SDL2.audio.scriptProcessorNode['connect'](SDL2.audioContext['destination']); },  
+ 1539072: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.capture.currentCaptureBuffer.getChannelData(c); if (channelData.length != $1) { throw 'Web Audio capture buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } if (numChannels == 1) { for (var j = 0; j < $1; ++j) { setValue($0 + (j * 4), channelData[j], 'float'); } } else { for (var j = 0; j < $1; ++j) { setValue($0 + (((j * numChannels) + c) * 4), channelData[j], 'float'); } } } },  
+ 1539677: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.audio.currentOutputBuffer['numberOfChannels']; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.audio.currentOutputBuffer['getChannelData'](c); if (channelData.length != $1) { throw 'Web Audio output buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } for (var j = 0; j < $1; ++j) { channelData[j] = HEAPF32[$0 + ((j*numChannels + c) << 2) >> 2]; } } },  
+ 1540157: ($0) => { var SDL2 = Module['SDL2']; if ($0) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); } if (SDL2.capture.stream !== undefined) { var tracks = SDL2.capture.stream.getAudioTracks(); for (var i = 0; i < tracks.length; i++) { SDL2.capture.stream.removeTrack(tracks[i]); } SDL2.capture.stream = undefined; } if (SDL2.capture.scriptProcessorNode !== undefined) { SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) {}; SDL2.capture.scriptProcessorNode.disconnect(); SDL2.capture.scriptProcessorNode = undefined; } if (SDL2.capture.mediaStreamNode !== undefined) { SDL2.capture.mediaStreamNode.disconnect(); SDL2.capture.mediaStreamNode = undefined; } if (SDL2.capture.silenceBuffer !== undefined) { SDL2.capture.silenceBuffer = undefined } SDL2.capture = undefined; } else { if (SDL2.audio.scriptProcessorNode != undefined) { SDL2.audio.scriptProcessorNode.disconnect(); SDL2.audio.scriptProcessorNode = undefined; } SDL2.audio = undefined; } if ((SDL2.audioContext !== undefined) && (SDL2.audio === undefined) && (SDL2.capture === undefined)) { SDL2.audioContext.close(); SDL2.audioContext = undefined; } }
 };
 
 
@@ -14862,9 +14862,9 @@ var ASM_CONSTS = {
           siv3dPhotonClient.changeGroups(leave, join);
       }
 
-  var siv3dPhotonCallbackCode = {ConnectionErrorReturn:1,ConnectReturn:11,ReconnectReturn:12,DisconnectReturn:13,LeaveRoomReturn:21,JoinRandomRoomReturn:22,JoinRandomOrCreateRoomReturn:23,JoinRoomReturn:24,CreateRoomReturn:25,JoinOrCreateRoomReturn:26,StateChange:31,AppStateChange:32,ActorJoin:33,ActorLeave:34,CustomEvent:35,OnRoomListUpdate:41,OnRoomPropertiesChange:42,OnPlayerPropertiesChange:43};
+  var siv3dPhotonCallbackCode = {ConnectionErrorReturn:1,ConnectReturn:11,DisconnectReturn:12,LeaveRoomReturn:21,JoinRandomRoomReturn:22,JoinRandomOrCreateRoomReturn:23,JoinRoomReturn:24,JoinOrCreateRoomReturn:25,CreateRoomReturn:26,ClientStateChange:31,AppStateChange:32,ActorJoin:33,ActorLeave:34,CustomEvent:35,OnRoomListUpdate:41,OnRoomPropertiesChange:42,OnPlayerPropertiesChange:43};
   function _siv3dPhotonConnect(userId_ptr, region_ptr) {
-          siv3dPhotonClient.waitingCallback = siv3dPhotonCallbackCode.ConnectReturn;
+          siv3dPhotonClient.disconnect();
   
           siv3dPhotonClient.setUserId(UTF32ToString(userId_ptr));
           siv3dPhotonClient.region = UTF32ToString(region_ptr);
@@ -14877,6 +14877,8 @@ var ASM_CONSTS = {
           if (!siv3dPhotonClient.connectToNameServer(options)) {
               return false;
           }
+  
+          siv3dPhotonClient.waitingCallback = siv3dPhotonCallbackCode.ConnectReturn;
   
           return true;
       }
@@ -15058,6 +15060,7 @@ var ASM_CONSTS = {
           }
       }
 
+  var siv3dPhotonClientState = {Disconnected:0,ConnectingToLobby:1,InLobby:2,JoiningRoom:3,InRoom:4,LeavingRoom:5,Disconnecting:6};
   function _siv3dPhotonInitClient(appID_ptr, appVersion_ptr, verbose, protocol) {
           const appID = UTF32ToString(appID_ptr);
           const appVersion = UTF32ToString(appVersion_ptr);
@@ -15073,31 +15076,16 @@ var ASM_CONSTS = {
   
           siv3dPhotonClient.setLogLevel(verbose ? Photon.LogLevel.DEBUG : Photon.LogLevel.WARN);
   
+          /*
           const initNameServerPeer_ = Photon.LoadBalancing.LoadBalancingClient.prototype.initNameServerPeer;
           Photon.LoadBalancing.LoadBalancingClient.prototype.initNameServerPeer = function (peer) {
               initNameServerPeer_.call(this, peer);
-  
-              peer.addPeerStatusListener(Photon.PhotonPeer.StatusCodes.connectFailed, function () {
-                  siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: 1, errMsg: "NameServer peer connect failed" });
-              });
-  
-              peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.Authenticate, function (data) {
-                  if (data.errCode) {
-                      siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "" });
-                  }
-              });
           };
+          */
   
           const initMasterPeer_ = Photon.LoadBalancing.LoadBalancingClient.prototype.initMasterPeer;
           Photon.LoadBalancing.LoadBalancingClient.prototype.initMasterPeer = function (peer) {
               initMasterPeer_.call(this, peer);
-  
-              peer.addPeerStatusListener(Photon.PhotonPeer.StatusCodes.connectFailed, function () {
-                  siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: 1, errMsg: "MasterServer peer connect failed" });
-              });
-              peer.addPeerStatusListener(Photon.PhotonPeer.StatusCodes.disconnect, function () {
-                  siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.DisconnectReturn, errCode: 1, errMsg: "Disconnected" });
-              });
       
               peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.JoinRandomGame, function (data) {
                   siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.JoinRandomRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
@@ -15106,12 +15094,8 @@ var ASM_CONSTS = {
                   siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.JoinRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
               });
               peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.CreateGame, function (data) {
-                  siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.CreateRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
-              });
-  
-              peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.Authenticate, function (data) {
                   if (data.errCode) {
-                      siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "" });
+                      siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.CreateRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
                   }
               });
           };
@@ -15123,24 +15107,36 @@ var ASM_CONSTS = {
               peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.Leave, function (data) {
                   siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.LeaveRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "" });
               });
-  
-              peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.Authenticate, function (data) {
-                  if (data.errCode) {
-                      siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "" });
-                  }
-              });
           };
   
           siv3dPhotonClient.onStateChange = function (state) {
-              siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.StateChange, state: state });
+              let clientState;
               const State = Photon.LoadBalancing.LoadBalancingClient.State;
               switch (state) {
-                  case State.ConnectedToMaster:
-                      siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: 0, errMsg: "" });
+                  case State.Error:
+                  case State.Uninitialized:
+                  case State.Disconnected:
+                      clientState = siv3dPhotonClientState.Disconnected;
                       break;
+                  case State.ConnectingToNameServer:
+                  case State.ConnectedToNameServer:
+                  case State.ConnectingToMasterserver:
+                  case State.ConnectedToMaster:
+                      clientState = siv3dPhotonClientState.ConnectingToLobby;
+                      break;
+                  case State.JoinedLobby:
+                      siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: 0, errMsg: "" });
+                      clientState = siv3dPhotonClientState.InLobby;
+                      break;
+                  case State.ConnectingToGameserver:
                   case State.ConnectedToGameserver:
+                      clientState = siv3dPhotonClientState.JoiningRoom;
+                      break;
+                  case State.Joined:
+                      clientState = siv3dPhotonClientState.InRoom;
                       break;
               }
+              siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ClientStateChange, state: clientState });
           };
           
           siv3dPhotonClient.onAppStats = function (errorCode, errorMsg, stats) {
@@ -15178,14 +15174,6 @@ var ASM_CONSTS = {
                   siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectionErrorReturn, errCode: errorCode, errMsg: errorMsg });
               }
           };
-      }
-
-  function _siv3dPhotonIsInLobby() {
-          return siv3dPhotonClient.isInLobby();
-      }
-
-  function _siv3dPhotonIsJoinedToRoom() {
-          return siv3dPhotonClient.isJoinedToRoom();
       }
 
   function _siv3dPhotonJoinRandomOrCreateRoom(roomName_ptr, opt_ptr, maxPlayers, matchmakingMode, filter_ptr) {
@@ -15262,15 +15250,17 @@ var ASM_CONSTS = {
           return siv3dPhotonClient.raiseEvent(eventCode, data_ptr ? UTF8ToString(data_ptr) : "", JSON.parse(UTF32ToString(opt)));
       }
 
-  function _siv3dPhotonReconnectToMaster() {
+  function _siv3dPhotonReconnectAndRejoin() {
           if (siv3dPhotonClient.waitingCallback) {
               return false;
           }
   
-          let result = siv3dPhotonClient.reconnectToMaster();
+          siv3dPhotonClient.disconnect();
+  
+          const result = siv3dPhotonClient.reconnectAndRejoin();
   
           if (result) {
-              siv3dPhotonClient.waitingCallback = siv3dPhotonCallbackCode.ReconnectReturn;
+              siv3dPhotonClient.waitingCallback = siv3dPhotonCallbackCode.ConnectReturn;
           }
   
           return result;
@@ -15337,7 +15327,6 @@ var ASM_CONSTS = {
                       break;
   
                   case siv3dPhotonCallbackCode.ConnectReturn:
-                  case siv3dPhotonCallbackCode.ReconnectReturn:
                   case siv3dPhotonCallbackCode.LeaveRoomReturn:
                       if (siv3dPhotonClient.waitingCallback == callback.type) {
                           siv3dPhotonClient.waitingCallback = null;
@@ -15372,7 +15361,8 @@ var ASM_CONSTS = {
                       }
                       break;
   
-                  case siv3dPhotonCallbackCode.StateChange:
+                  case siv3dPhotonCallbackCode.ClientStateChange:
+                      _siv3dPhotonClientStateChangeCallback(callback.state);
                       break;
                   case siv3dPhotonCallbackCode.AppStateChange:
                       _siv3dPhotonAppStateChangeCallback(callback.stats.gameCount, callback.stats.peerCount, callback.stats.masterPeerCount);
@@ -17172,14 +17162,12 @@ var asmLibraryArg = {
   "siv3dPhotonGetServerTime": _siv3dPhotonGetServerTime,
   "siv3dPhotonGetVisibleRoomPropertyKeys": _siv3dPhotonGetVisibleRoomPropertyKeys,
   "siv3dPhotonInitClient": _siv3dPhotonInitClient,
-  "siv3dPhotonIsInLobby": _siv3dPhotonIsInLobby,
-  "siv3dPhotonIsJoinedToRoom": _siv3dPhotonIsJoinedToRoom,
   "siv3dPhotonJoinRandomOrCreateRoom": _siv3dPhotonJoinRandomOrCreateRoom,
   "siv3dPhotonJoinRandomRoom": _siv3dPhotonJoinRandomRoom,
   "siv3dPhotonJoinRoom": _siv3dPhotonJoinRoom,
   "siv3dPhotonLeaveRoom": _siv3dPhotonLeaveRoom,
   "siv3dPhotonRaiseEvent": _siv3dPhotonRaiseEvent,
-  "siv3dPhotonReconnectToMaster": _siv3dPhotonReconnectToMaster,
+  "siv3dPhotonReconnectAndRejoin": _siv3dPhotonReconnectAndRejoin,
   "siv3dPhotonRemovePlayerCustomProperties": _siv3dPhotonRemovePlayerCustomProperties,
   "siv3dPhotonRemoveRoomCustomProperties": _siv3dPhotonRemoveRoomCustomProperties,
   "siv3dPhotonService": _siv3dPhotonService,
@@ -17248,6 +17236,9 @@ var _siv3dPhotonGetRoomPlayerIDListCallback = Module["_siv3dPhotonGetRoomPlayerI
 
 /** @type {function(...*):?} */
 var _siv3dPhotonGeneralCallback = Module["_siv3dPhotonGeneralCallback"] = createExportWrapper("siv3dPhotonGeneralCallback");
+
+/** @type {function(...*):?} */
+var _siv3dPhotonClientStateChangeCallback = Module["_siv3dPhotonClientStateChangeCallback"] = createExportWrapper("siv3dPhotonClientStateChangeCallback");
 
 /** @type {function(...*):?} */
 var _siv3dPhotonAppStateChangeCallback = Module["_siv3dPhotonAppStateChangeCallback"] = createExportWrapper("siv3dPhotonAppStateChangeCallback");
@@ -19113,6 +19104,7 @@ var unexportedRuntimeSymbols = [
   'siv3dStringToNewUTF32',
   'siv3dPhotonClient',
   'siv3dPhotonCallbackCode',
+  'siv3dPhotonClientState',
 ];
 unexportedRuntimeSymbols.forEach(unexportedRuntimeSymbol);
 var missingLibrarySymbols = [

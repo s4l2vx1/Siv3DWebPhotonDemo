@@ -384,10 +384,6 @@ namespace s3d
 
 			const bool isSelf = (playerID == m_context.getLocalPlayerID());
 
-			if (isSelf) {
-				m_context.m_lastJoinedRoomName = m_context.getCurrentRoomName();
-			}
-
 			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::joinRoomEventAction() [誰か（自分を含む）が現在のルームに参加したときに呼ばれる]");
 			m_context.logger(U"- [Multiplayer_Photon] playerID [参加した人の ID]: ", playerID);
 			m_context.logger(U"- [Multiplayer_Photon] isSelf [自分自身の参加？]: ", isSelf);
@@ -738,8 +734,8 @@ namespace s3d::detail
 		__attribute__((import_name("siv3dPhotonCreateRoom")))
 		bool siv3dPhotonCreateRoom(bool join, const char32* roomName, const char32* roomOpt);
 
-		__attribute__((import_name("siv3dPhotonReconnectToMaster")))
-		bool siv3dPhotonReconnectToMaster();
+		__attribute__((import_name("siv3dPhotonReconnectAndRejoin")))
+		bool siv3dPhotonReconnectAndRejoin();
 
 		__attribute__((import_name("siv3dPhotonLeaveRoom")))
 		void siv3dPhotonLeaveRoom(bool willComeBack);
@@ -838,8 +834,6 @@ namespace s3d
 		RoomInfo m_currentRoom;
 
 		bool m_isVisibleInCurrentRoom;
-		
-		String m_lastJoinedRoomName = U"";
 
 		bool joinRandomRoom(const int32 expectedMaxPlayers, MatchmakingMode matchmakingMode, StringView filter)
 		{
@@ -849,11 +843,6 @@ namespace s3d
 			}
 
 			bool result = detail::siv3dPhotonJoinRandomRoom(expectedMaxPlayers, matchmakingMode, filter.data());
-
-			if (result)
-			{
-				m_clientState = ClientState::JoiningRoom;
-			}
 
 			return result;
 		}
@@ -867,11 +856,6 @@ namespace s3d
 
 			bool result = detail::siv3dPhotonJoinRandomOrCreateRoom(roomName.data(), opt.data(), expectedMaxPlayers, matchmakingMode, filter.data());
 
-			if (result)
-			{
-				m_clientState = ClientState::JoiningRoom;
-			}
-
 			return result;
 		}
 
@@ -879,22 +863,12 @@ namespace s3d
 		{
 			bool result = detail::siv3dPhotonJoinRoom(roomName.data(), rejoin);
 
-			if (result)
-			{
-				m_clientState = ClientState::JoiningRoom;
-			}
-
 			return result;
 		}
 
 		bool joinOrCreateRoom(RoomNameView roomName, StringView opt)
 		{
 			bool result = detail::siv3dPhotonCreateRoom(true, roomName.data(), opt.data());
-
-			if (result)
-			{
-				m_clientState = ClientState::JoiningRoom;
-			}
 
 			return result;
 		}
@@ -906,35 +880,21 @@ namespace s3d
 			return result;
 		}
 
+		void leaveRoom(bool willComeBack)
+		{
+			if (m_context.isInRoom())
+			{
+				return;
+			}
+
+			m_clientState = ClientState::LeavingRoom;
+
+			detail::siv3dPhotonLeaveRoom(willComeBack);
+		}
+
 		bool reconnectAndRejoin()
 		{
-			if (not m_lastJoinedRoomName.isEmpty())
-			{
-				return false;
-			}
-
-			bool result;
-
-			if (m_context.getClientState() == ClientState::Disconnected)
-			{
-				result = detail::siv3dPhotonReconnectToMaster();
-
-				if (result)
-				{
-					m_clientState = ClientState::ConnectingToLobby;
-				}
-			}
-			else
-			{
-				result = detail::siv3dPhotonJoinRoom(m_lastJoinedRoomName.data(), true);
-
-				if (result)
-				{
-					m_clientState = ClientState::JoiningRoom;
-				}
-			}
-
-			return result;
+			return detail::siv3dPhotonReconnectAndRejoin();
 		}
 
 		void updateLocalPlayer()
@@ -967,7 +927,6 @@ namespace s3d
 			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::connectionErrorReturn() [サーバへの接続が失敗したときに呼ばれる]");
 			m_context.logger(U"- [Multiplayer_Photon] errorCode: ", errorCode);
 
-			m_clientState = ClientState::Disconnected;
 			m_context.connectionErrorReturn(errorCode);
 		}
 
@@ -979,39 +938,14 @@ namespace s3d
 			m_context.logger(U"[Multiplayer_Photon] region: ", region);
 
 			detail::LogIfError(m_context, errorCode, errorString);
-			
-			if (errorCode)
-			{
-				m_clientState = ClientState::Disconnected;
-			}
-			else
-			{
-				m_clientState = ClientState::InLobby;
-			}
 
 			m_context.connectReturn(errorCode, errorString, region, U"");
-		}
-
-		void reconnectReturn(int32 errorCode, const String& errorString)
-		{
-			if (errorCode)
-			{
-				m_clientState = ClientState::Disconnected;
-			}
-			else
-			{
-				m_clientState = ClientState::InLobby;
-				joinRoom(m_lastJoinedRoomName, true);
-			}
-			
-			connectReturn(errorCode, errorString);
 		}
 
 		void disconnectReturn()
 		{
 			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::disconnectReturn() [サーバから切断されたときに呼ばれる]");
 
-			m_clientState = ClientState::Disconnected;
 			m_context.disconnectReturn();
 		}
 
@@ -1020,11 +954,6 @@ namespace s3d
 			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::leaveRoomReturn() [ルームから退出した結果を処理する]");
 
 			detail::LogIfError(m_context, errorCode, errorString);
-
-			if (not errorCode)
-			{
-				m_clientState = ClientState::LeavingRoom;
-			}
 
 			m_context.leaveRoomReturn(errorCode, errorString);
 		}
@@ -1036,11 +965,6 @@ namespace s3d
 
 			detail::LogIfError(m_context, errorCode, errorString);
 
-			if (not errorCode)
-			{
-				m_clientState = ClientState::JoiningRoom;
-			}
-
 			m_context.joinRandomRoomReturn(playerID, errorCode, errorString);
 		}
 
@@ -1050,11 +974,6 @@ namespace s3d
 			m_context.logger(U"- [Multiplayer_Photon] playerID: ", playerID);
 
 			detail::LogIfError(m_context, errorCode, errorString);
-			
-			if (not errorCode)
-			{
-				m_clientState = ClientState::JoiningRoom;
-			}
 
 			m_context.joinRandomOrCreateRoomReturn(playerID, errorCode, errorString);
 		}
@@ -1066,9 +985,15 @@ namespace s3d
 
 			detail::LogIfError(m_context, errorCode, errorString);
 
-			if (not errorCode) {
-				m_clientState = ClientState::JoiningRoom;
-			}
+			m_context.joinRoomReturn(playerID, errorCode, errorString);
+		}
+
+		void joinOrCreateRoomReturn(LocalPlayerID playerID, int32 errorCode, const String& errorString)
+		{
+			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::joinOrCreateRoomReturn()");
+			m_context.logger(U"- [Multiplayer_Photon] playerID: ", playerID);
+
+			detail::LogIfError(m_context, errorCode, errorString);
 
 			m_context.joinRoomReturn(playerID, errorCode, errorString);
 		}
@@ -1080,14 +1005,6 @@ namespace s3d
 
 			detail::LogIfError(m_context, errorCode, errorString);
 
-			if (errorCode)
-			{
-			}
-			else
-			{
-				m_clientState = ClientState::JoiningRoom;
-			}
-
 			m_context.createRoomReturn(playerID, errorCode, errorString);
 		}
 
@@ -1096,8 +1013,6 @@ namespace s3d
 			Array<LocalPlayerID> localPlayerIDs = getLocalPlayerIDList();
 			
 			updateCurrentRoom();
-
-			m_lastJoinedRoomName = m_currentRoom.name;
 
 			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::joinRoomEventAction() [誰か（自分を含む）が現在のルームに参加したときに呼ばれる]");
 			m_context.logger(U"- [Multiplayer_Photon] playerID [参加した人の ID]: ", playerID);
@@ -1198,13 +1113,13 @@ namespace s3d::detail
 		enum class PhotonCallbackCode : uint8 {
         	ConnectionErrorReturn = 1,
         	ConnectReturn = 11,
-        	ReconnectReturn = 12,
-        	DisconnectReturn = 13,
+        	DisconnectReturn = 12,
         	LeaveRoomReturn = 21,
         	JoinRandomRoomReturn = 22,
         	JoinRandomOrCreateRoomReturn = 23,
         	JoinRoomReturn = 24,
-        	CreateRoomReturn = 25,
+	        JoinOrCreateRoomReturn = 25,
+        	CreateRoomReturn = 26,
     	};
 
 		__attribute__((used, export_name("siv3dPhotonGeneralCallback")))
@@ -1222,9 +1137,6 @@ namespace s3d::detail
 				case PhotonCallbackCode::ConnectReturn:
 					g_detail->connectReturn(errorCode, errorString);
 					break;
-				case PhotonCallbackCode::ReconnectReturn:
-					g_detail->reconnectReturn(errorCode, errorString);
-					break;
 				case PhotonCallbackCode::DisconnectReturn:
 					g_detail->disconnectReturn();
 					break;
@@ -1240,6 +1152,9 @@ namespace s3d::detail
 				case PhotonCallbackCode::JoinRoomReturn:
 					g_detail->joinRoomReturn(player, errorCode, errorString);
 					break;
+				case PhotonCallbackCode::JoinOrCreateRoomReturn:
+					g_detail->joinOrCreateRoomReturn(player, errorCode, errorString);
+					break;
 				case PhotonCallbackCode::CreateRoomReturn:
 					g_detail->createRoomReturn(player, errorCode, errorString);
 					break;
@@ -1247,6 +1162,14 @@ namespace s3d::detail
 			}
 			
 			free(static_cast<void*>(errorString_));
+		}
+
+		__attribute__((used, export_name("siv3dPhotonClientStateChangeCallback")))
+		void siv3dPhotonClientStateChangeCallback(int32 state)
+		{
+			if (not g_detail) return;
+
+			g_detail->m_clientState = static_cast<ClientState>(state);
 		}
 
 		__attribute__((used, export_name("siv3dPhotonAppStateChangeCallback")))
@@ -2039,25 +1962,7 @@ namespace s3d
 			return false;
 		}
 
-		if (m_lastJoinedRoomName.isEmpty())
-		{
-			return false;
-		}
-
-		auto state = getClientState();
-
-		if (state == ClientState::InLobby)
-		{
-			constexpr bool rejoin = true;
-			return m_client->opJoinRoom(detail::ToJString(m_lastJoinedRoomName), rejoin);
-		}
-
-		if (state == ClientState::Disconnected)
-		{
-			return m_client->reconnectAndRejoin();
-		}
-
-		return false;
+		return detail::siv3dPhotonReconnectAndRejoin();
 	}
 
 	void Multiplayer_Photon::joinEventTargetGroup(uint8 targetGroup)
@@ -2146,12 +2051,12 @@ namespace s3d
 {
 	void Multiplayer_Photon::init(const StringView secretPhotonAppID, const StringView photonAppVersion, const std::function<void(StringView)>& logger, const Verbose verbose, const ConnectionProtocol protocol)
 	{
-		if (g_detail) // すでに初期化済みであれば何もしない
+		if (m_detail) // すでに初期化済みであれば何もしない
 		{
 			return;
 		}
 
-		m_detail = std::make_shared<PhotonDetail>(*this);
+		m_detail = std::make_unique<PhotonDetail>(*this);
 		g_detail = m_detail.get();
 
 		m_secretPhotonAppID = secretPhotonAppID;
@@ -2194,8 +2099,6 @@ namespace s3d
 			return false;
 		}
 
-		m_detail->m_clientState = ClientState::ConnectingToLobby;
-
 		return true;
 	}
 
@@ -2207,7 +2110,7 @@ namespace s3d
 
 	void Multiplayer_Photon::update()
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -2217,47 +2120,32 @@ namespace s3d
 
 	bool Multiplayer_Photon::isActive() const noexcept
 	{
-		return g_detail && g_detail->m_clientState != ClientState::Disconnected;
+		return getClientState() != ClientState::Disconnected;
 	}
 	
 	ClientState Multiplayer_Photon::getClientState() const
 	{
-		return g_detail ? g_detail->m_clientState : ClientState::Disconnected;
+		return m_detail ? m_detail->m_clientState : ClientState::Disconnected;
 	}
 
 	bool Multiplayer_Photon::isInLobby() const
 	{
-		if (not g_detail)
-		{
-			return false;
-		}
-
-		return detail::siv3dPhotonIsInLobby();
+		return m_detail->m_clientState == ClientState::InLobby;
 	}
 
 	bool Multiplayer_Photon::isInLobbyOrInRoom() const
 	{
-		if (not g_detail)
-		{
-			return false;
-		}
-
 		return isInLobby() or isInRoom();
 	}
 
 	bool Multiplayer_Photon::isInRoom() const
 	{
-		if (not g_detail)
-		{
-			return false;
-		}
-
-		return detail::siv3dPhotonIsJoinedToRoom();
+		return m_detail->m_clientState == ClientState::InRoom;
 	}
 
 	Array<RoomInfo> Multiplayer_Photon::getRoomList() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return {};
 		}
@@ -2271,7 +2159,7 @@ namespace s3d
 
 	Array<RoomName> Multiplayer_Photon::getRoomNameList() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return{};
 		}
@@ -2285,7 +2173,7 @@ namespace s3d
 
 	bool Multiplayer_Photon::joinRandomRoom(const int32 expectedMaxPlayers, MatchmakingMode matchmakingMode)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return false;
 		}
@@ -2295,12 +2183,12 @@ namespace s3d
 			return false;
 		}
 
-		return g_detail->joinRandomRoom(expectedMaxPlayers, matchmakingMode, U"{}");
+		return m_detail->joinRandomRoom(expectedMaxPlayers, matchmakingMode, U"{}");
 	}
 
 	bool Multiplayer_Photon::joinRandomRoom(const HashTable<String, String>& propertyFilter, int32 expectedMaxPlayers, MatchmakingMode matchmakingMode)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return false;
 		}
@@ -2310,12 +2198,12 @@ namespace s3d
 			return false;
 		}
 
-		return g_detail->joinRandomRoom(expectedMaxPlayers, matchmakingMode, detail::HashTableToJSON(propertyFilter));
+		return m_detail->joinRandomRoom(expectedMaxPlayers, matchmakingMode, detail::HashTableToJSON(propertyFilter));
 	}
 
 	bool Multiplayer_Photon::joinRandomOrCreateRoom(const int32 maxPlayers, const RoomNameView roomName)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return false;
 		}
@@ -2325,12 +2213,12 @@ namespace s3d
 			return false;
 		}
 
-		return g_detail->joinRandomOrCreateRoom(roomName, U"{}", U"{}", maxPlayers, MatchmakingMode::FillOldestRoom);
+		return m_detail->joinRandomOrCreateRoom(roomName, U"{}", U"{}", maxPlayers, MatchmakingMode::FillOldestRoom);
 	}
 
 	bool Multiplayer_Photon::joinRandomOrCreateRoom(RoomNameView roomName, const RoomCreateOption& roomCreateOption, const HashTable<String, String>& propertyFilter, int32 expectedMaxPlayers, MatchmakingMode matchmakingMode)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return false;
 		}
@@ -2340,32 +2228,32 @@ namespace s3d
 			return false;
 		}
 
-		return g_detail->joinRandomOrCreateRoom(roomName, detail::RoomCreateOptionToJSON(roomCreateOption), detail::HashTableToJSON(propertyFilter), expectedMaxPlayers, matchmakingMode);
+		return m_detail->joinRandomOrCreateRoom(roomName, detail::RoomCreateOptionToJSON(roomCreateOption), detail::HashTableToJSON(propertyFilter), expectedMaxPlayers, matchmakingMode);
 	}
 
 	bool Multiplayer_Photon::joinOrCreateRoom(RoomNameView roomName, const RoomCreateOption& option)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return false;
 		}
 
-		return g_detail->joinOrCreateRoom(roomName, detail::RoomCreateOptionToJSON(option));
+		return m_detail->joinOrCreateRoom(roomName, detail::RoomCreateOptionToJSON(option));
 	}
 
 	bool Multiplayer_Photon::joinRoom(const RoomNameView roomName)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return false;
 		}
 
-		return g_detail->joinRoom(roomName, false);
+		return m_detail->joinRoom(roomName, false);
 	}
 
 	bool Multiplayer_Photon::createRoom(const RoomNameView roomName, const int32 maxPlayers)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return false;
 		}
@@ -2375,44 +2263,42 @@ namespace s3d
 			return false;
 		}
 
-		return g_detail->createRoom(roomName, detail::RoomCreateOptionToJSON(RoomCreateOption().maxPlayers(maxPlayers)));
+		return m_detail->createRoom(roomName, detail::RoomCreateOptionToJSON(RoomCreateOption().maxPlayers(maxPlayers)));
 	}
 
 	bool Multiplayer_Photon::createRoom(RoomNameView roomName, const RoomCreateOption& option)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return false;
 		}
 
-		return g_detail->createRoom(roomName, detail::RoomCreateOptionToJSON(option));
+		return m_detail->createRoom(roomName, detail::RoomCreateOptionToJSON(option));
 	}
 
 	void Multiplayer_Photon::leaveRoom(bool willComeBack)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
 
-		g_detail->m_lastJoinedRoomName = U"";
-
-		detail::siv3dPhotonLeaveRoom(willComeBack);
+		m_detail->leaveRoom(willComeBack);
 	}
 	
 	bool Multiplayer_Photon::reconnectAndRejoin()
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return false;
 		}
 
-		return g_detail->reconnectAndRejoin();
+		return m_detail->reconnectAndRejoin();
 	}
 
 	int32 Multiplayer_Photon::getServerTimeMillisec() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return 0;
 		}
@@ -2422,7 +2308,7 @@ namespace s3d
 
 	int32 Multiplayer_Photon::getServerTimeOffsetMillisec() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return 0;
 		}
@@ -2432,7 +2318,7 @@ namespace s3d
 
 	int32 Multiplayer_Photon::getPingMillisec() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return 0;
 		}
@@ -2442,7 +2328,7 @@ namespace s3d
 
 	int32 Multiplayer_Photon::getCountGamesRunning() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return 0;
 		}
@@ -2452,7 +2338,7 @@ namespace s3d
 
 	int32 Multiplayer_Photon::getCountPlayersIngame() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return 0;
 		}
@@ -2462,7 +2348,7 @@ namespace s3d
 
 	int32 Multiplayer_Photon::getCountPlayersOnline() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return 0;
 		}
@@ -2477,7 +2363,7 @@ namespace s3d
 
 	void Multiplayer_Photon::joinEventTargetGroup(const Array<uint8>& targetGroups)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -2494,7 +2380,7 @@ namespace s3d
 
 	void Multiplayer_Photon::joinAllEventTargetGroups()
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -2509,7 +2395,7 @@ namespace s3d
 
 	void Multiplayer_Photon::leaveEventTargetGroup(const Array<uint8>& targetGroups)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -2526,7 +2412,7 @@ namespace s3d
 
 	void Multiplayer_Photon::leaveAllEventTargetGroups()
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -3037,7 +2923,7 @@ namespace s3d
 {
 	void Multiplayer_Photon::sendEvent(const MultiplayerEvent& event, const Serializer<MemoryWriter>& writer)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -3695,7 +3581,7 @@ namespace s3d
 	template<>
 	void Multiplayer_Photon::removeEventCache(uint8 eventCode)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -3715,7 +3601,7 @@ namespace s3d
 	template<>
 	void Multiplayer_Photon::removeEventCache(uint8 eventCode, const Array<LocalPlayerID>& targets)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -3734,7 +3620,7 @@ namespace s3d
 
 	LocalPlayer Multiplayer_Photon::getLocalPlayer() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return{};
 		}
@@ -3746,7 +3632,7 @@ namespace s3d
 
 	LocalPlayer Multiplayer_Photon::getLocalPlayer(LocalPlayerID localPlayerID) const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return{};
 		}
@@ -3770,7 +3656,7 @@ namespace s3d
 
 	String Multiplayer_Photon::getUserName() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return{};
 		}
@@ -3782,7 +3668,7 @@ namespace s3d
 	
 	String Multiplayer_Photon::getUserName(LocalPlayerID localPlayerID) const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return {};
 		}
@@ -3792,7 +3678,7 @@ namespace s3d
 
 	String Multiplayer_Photon::getUserID() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return {};
 		}
@@ -3802,7 +3688,7 @@ namespace s3d
 
 	String Multiplayer_Photon::getUserID(LocalPlayerID localPlayerID) const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return {};
 		}
@@ -3812,7 +3698,7 @@ namespace s3d
 
 	bool Multiplayer_Photon::isHost() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return false;
 		}
@@ -3822,7 +3708,7 @@ namespace s3d
 
 	LocalPlayerID Multiplayer_Photon::getLocalPlayerID() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return -1;
 		}
@@ -3834,7 +3720,7 @@ namespace s3d
 
 	LocalPlayerID Multiplayer_Photon::getHostLocalPlayerID() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return -1;
 		}
@@ -3844,7 +3730,7 @@ namespace s3d
 
 	void Multiplayer_Photon::setUserName(StringView name)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -3861,7 +3747,7 @@ namespace s3d
 
 	RoomInfo Multiplayer_Photon::getCurrentRoom() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return{};
 		}
@@ -3885,7 +3771,7 @@ namespace s3d
 
 	Array<LocalPlayer> Multiplayer_Photon::getLocalPlayers() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return{};
 		}
@@ -3925,12 +3811,12 @@ namespace s3d
 
 	bool Multiplayer_Photon::getIsVisibleInCurrentRoom() const
 	{
-		return g_detail->m_isVisibleInCurrentRoom;
+		return m_detail->m_isVisibleInCurrentRoom;
 	}
 
 	void Multiplayer_Photon::setIsOpenInCurrentRoom(const bool isOpen)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -3940,7 +3826,7 @@ namespace s3d
 
 	void Multiplayer_Photon::setIsVisibleInCurrentRoom(const bool isVisible)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -3955,7 +3841,7 @@ namespace s3d
 
 	String Multiplayer_Photon::getPlayerProperty(LocalPlayerID localPlayerID, StringView key) const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return {};
 		}
@@ -3975,7 +3861,7 @@ namespace s3d
 
 	HashTable<String, String> Multiplayer_Photon::getPlayerProperties(LocalPlayerID localPlayerID) const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return{};
 		}
@@ -3994,7 +3880,7 @@ namespace s3d
 
 	void Multiplayer_Photon::setPlayerProperty(StringView key, StringView value)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -4014,7 +3900,7 @@ namespace s3d
 
 	void Multiplayer_Photon::removePlayerProperty(const Array<String>& keys)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -4036,7 +3922,7 @@ namespace s3d
 
 	String Multiplayer_Photon::getRoomProperty(StringView key) const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return {};
 		}
@@ -4051,7 +3937,7 @@ namespace s3d
 
 	HashTable<String, String> Multiplayer_Photon::getRoomProperties() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return{};
 		}
@@ -4070,7 +3956,7 @@ namespace s3d
 
 	void Multiplayer_Photon::setRoomProperty(StringView key, StringView value)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -4090,7 +3976,7 @@ namespace s3d
 
 	void Multiplayer_Photon::removeRoomProperty(const Array<String>& keys)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}
@@ -4112,7 +3998,7 @@ namespace s3d
 
 	Array<String> Multiplayer_Photon::getVisibleRoomPropertyKeys() const
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return{};
 		}
@@ -4131,7 +4017,7 @@ namespace s3d
 
 	void Multiplayer_Photon::setVisibleRoomPropertyKeys(const Array<String>& keys)
 	{
-		if (not g_detail)
+		if (not m_detail)
 		{
 			return;
 		}

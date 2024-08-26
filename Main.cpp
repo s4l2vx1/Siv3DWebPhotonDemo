@@ -241,9 +241,8 @@ private:
 		logger(U"<<< StringEvent2 を受信: {}"_fmt(value));
 	}
 
-
 	void onCustomDataTest1(LocalPlayerID sender) {
-		logger(U"<<< CustomDataTest1 を受信"_fmt());
+		logger(U"<<< CustomDataTest1 を受信");
 	}
 
 	void onCustomDataTest2(LocalPlayerID sender, Array<double> a) {
@@ -251,17 +250,17 @@ private:
 	}
 
 	void onCustomDataTest3(LocalPlayerID sender, Array<double>& a) {
-		logger(U"<<< CustomDataTest3 を受信: {}"_fmt());
+		logger(U"<<< CustomDataTest3 を受信: {}"_fmt(a));
 	}
 
 	void onCustomDataTest4(LocalPlayerID sender, Array<double>&& a) {
-		logger(U"<<< CustomDataTest4 を受信: {}"_fmt());
+		logger(U"<<< CustomDataTest4 を受信: {}"_fmt(a));
 	}
 
 	// シリアライズデータを受信したときに呼ばれる関数をオーバーライドしてカスタマイズする
 	void customEventAction(const LocalPlayerID playerID, const uint8 eventCode, Deserializer<MemoryViewReader>& reader) override
 	{
-		logger(U"<<< {} を受信: {}"_fmt(eventCode));
+		logger(U"<<< {} を受信"_fmt(eventCode));
 	}
 
 	void onRoomListUpdate() override

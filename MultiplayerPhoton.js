@@ -12,15 +12,14 @@ mergeInto(LibraryManager.library, {
     $siv3dPhotonCallbackCode: {
         ConnectionErrorReturn: 1,
         ConnectReturn: 11,
-        ReconnectReturn: 12,
-        DisconnectReturn: 13,
+        DisconnectReturn: 12,
         LeaveRoomReturn: 21,
         JoinRandomRoomReturn: 22,
         JoinRandomOrCreateRoomReturn: 23,
         JoinRoomReturn: 24,
-        CreateRoomReturn: 25,
-        JoinOrCreateRoomReturn: 26,
-        StateChange: 31,
+        JoinOrCreateRoomReturn: 25,
+        CreateRoomReturn: 26,
+        ClientStateChange: 31,
         AppStateChange: 32,
         ActorJoin: 33,
         ActorLeave: 34,
@@ -28,6 +27,16 @@ mergeInto(LibraryManager.library, {
         OnRoomListUpdate: 41,
         OnRoomPropertiesChange: 42,
         OnPlayerPropertiesChange: 43,
+    },
+
+    $siv3dPhotonClientState: {
+		Disconnected: 0,
+		ConnectingToLobby: 1,
+		InLobby: 2,
+		JoiningRoom: 3,
+		InRoom: 4,
+		LeavingRoom: 5,
+		Disconnecting: 6,
     },
 
     siv3dPhotonInitClient: function (appID_ptr, appVersion_ptr, verbose, protocol) {
@@ -45,31 +54,16 @@ mergeInto(LibraryManager.library, {
 
         siv3dPhotonClient.setLogLevel(verbose ? Photon.LogLevel.DEBUG : Photon.LogLevel.WARN);
 
+        /*
         const initNameServerPeer_ = Photon.LoadBalancing.LoadBalancingClient.prototype.initNameServerPeer;
         Photon.LoadBalancing.LoadBalancingClient.prototype.initNameServerPeer = function (peer) {
             initNameServerPeer_.call(this, peer);
-
-            peer.addPeerStatusListener(Photon.PhotonPeer.StatusCodes.connectFailed, function () {
-                siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: 1, errMsg: "NameServer peer connect failed" });
-            });
-
-            peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.Authenticate, function (data) {
-                if (data.errCode) {
-                    siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "" });
-                }
-            });
         };
+        */
 
         const initMasterPeer_ = Photon.LoadBalancing.LoadBalancingClient.prototype.initMasterPeer;
         Photon.LoadBalancing.LoadBalancingClient.prototype.initMasterPeer = function (peer) {
             initMasterPeer_.call(this, peer);
-
-            peer.addPeerStatusListener(Photon.PhotonPeer.StatusCodes.connectFailed, function () {
-                siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: 1, errMsg: "MasterServer peer connect failed" });
-            });
-            peer.addPeerStatusListener(Photon.PhotonPeer.StatusCodes.disconnect, function () {
-                siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.DisconnectReturn, errCode: 1, errMsg: "Disconnected" });
-            });
     
             peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.JoinRandomGame, function (data) {
                 siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.JoinRandomRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
@@ -78,12 +72,8 @@ mergeInto(LibraryManager.library, {
                 siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.JoinRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
             });
             peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.CreateGame, function (data) {
-                siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.CreateRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
-            });
-
-            peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.Authenticate, function (data) {
                 if (data.errCode) {
-                    siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "" });
+                    siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.CreateRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
                 }
             });
         };
@@ -95,24 +85,36 @@ mergeInto(LibraryManager.library, {
             peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.Leave, function (data) {
                 siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.LeaveRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "" });
             });
-
-            peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.Authenticate, function (data) {
-                if (data.errCode) {
-                    siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "" });
-                }
-            });
         };
 
         siv3dPhotonClient.onStateChange = function (state) {
-            siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.StateChange, state: state });
+            let clientState;
             const State = Photon.LoadBalancing.LoadBalancingClient.State;
             switch (state) {
-                case State.ConnectedToMaster:
-                    siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: 0, errMsg: "" });
+                case State.Error:
+                case State.Uninitialized:
+                case State.Disconnected:
+                    clientState = siv3dPhotonClientState.Disconnected;
                     break;
+                case State.ConnectingToNameServer:
+                case State.ConnectedToNameServer:
+                case State.ConnectingToMasterserver:
+                case State.ConnectedToMaster:
+                    clientState = siv3dPhotonClientState.ConnectingToLobby;
+                    break;
+                case State.JoinedLobby:
+                    siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectReturn, errCode: 0, errMsg: "" });
+                    clientState = siv3dPhotonClientState.InLobby;
+                    break;
+                case State.ConnectingToGameserver:
                 case State.ConnectedToGameserver:
+                    clientState = siv3dPhotonClientState.JoiningRoom;
+                    break;
+                case State.Joined:
+                    clientState = siv3dPhotonClientState.InRoom;
                     break;
             }
+            siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ClientStateChange, state: clientState });
         };
         
         siv3dPhotonClient.onAppStats = function (errorCode, errorMsg, stats) {
@@ -152,10 +154,10 @@ mergeInto(LibraryManager.library, {
         };
     },
     siv3dPhotonInitClient__sig: "viiii",
-    siv3dPhotonInitClient__deps: ["$siv3dPhotonClient", "$siv3dPhotonCallbackCode"],
+    siv3dPhotonInitClient__deps: ["$siv3dPhotonClient", "$siv3dPhotonCallbackCode", "$siv3dPhotonClientState"],
 
     siv3dPhotonConnect: function (userId_ptr, region_ptr) {
-        siv3dPhotonClient.waitingCallback = siv3dPhotonCallbackCode.ConnectReturn;
+        siv3dPhotonClient.disconnect();
 
         siv3dPhotonClient.setUserId(UTF32ToString(userId_ptr));
         siv3dPhotonClient.region = UTF32ToString(region_ptr);
@@ -168,6 +170,8 @@ mergeInto(LibraryManager.library, {
         if (!siv3dPhotonClient.connectToNameServer(options)) {
             return false;
         }
+
+        siv3dPhotonClient.waitingCallback = siv3dPhotonCallbackCode.ConnectReturn;
 
         return true;
     },
@@ -205,7 +209,6 @@ mergeInto(LibraryManager.library, {
                     break;
 
                 case siv3dPhotonCallbackCode.ConnectReturn:
-                case siv3dPhotonCallbackCode.ReconnectReturn:
                 case siv3dPhotonCallbackCode.LeaveRoomReturn:
                     if (siv3dPhotonClient.waitingCallback == callback.type) {
                         siv3dPhotonClient.waitingCallback = null;
@@ -240,7 +243,8 @@ mergeInto(LibraryManager.library, {
                     }
                     break;
 
-                case siv3dPhotonCallbackCode.StateChange:
+                case siv3dPhotonCallbackCode.ClientStateChange:
+                    _siv3dPhotonClientStateChangeCallback(callback.state);
                     break;
                 case siv3dPhotonCallbackCode.AppStateChange:
                     _siv3dPhotonAppStateChangeCallback(callback.stats.gameCount, callback.stats.peerCount, callback.stats.masterPeerCount);
@@ -282,6 +286,7 @@ mergeInto(LibraryManager.library, {
         "$siv3dPhotonClient",
         "$siv3dPhotonCallbackCode",
         "siv3dPhotonGeneralCallback",
+        "siv3dPhotonClientStateChangeCallback",
         "siv3dPhotonAppStateChangeCallback",
         "siv3dPhotonActorJoinCallback",
         "siv3dPhotonActorLeaveCallback",
@@ -411,15 +416,17 @@ mergeInto(LibraryManager.library, {
     siv3dPhotonCreateRoom__sig: "iii",
     siv3dPhotonCreateRoom__deps: ["$siv3dPhotonClient", "$siv3dPhotonCallbackCode", "$UTF32ToString"],
 
-    siv3dPhotonReconnectToMaster: function () {
+    siv3dPhotonReconnectAndRejoin: function () {
         if (siv3dPhotonClient.waitingCallback) {
             return false;
         }
 
-        let result = siv3dPhotonClient.reconnectToMaster();
+        siv3dPhotonClient.disconnect();
+
+        const result = siv3dPhotonClient.reconnectAndRejoin();
 
         if (result) {
-            siv3dPhotonClient.waitingCallback = siv3dPhotonCallbackCode.ReconnectReturn;
+            siv3dPhotonClient.waitingCallback = siv3dPhotonCallbackCode.ConnectReturn;
         }
 
         return result;
