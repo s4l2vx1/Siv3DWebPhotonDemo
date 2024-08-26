@@ -135,7 +135,11 @@ mergeInto(LibraryManager.library, {
             siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.CustomEvent, eventCode: eventCode, message: content, actorNr: actorNr });
         };
 
-        siv3dPhotonClient.onRoomListUpdate = function (rooms) {
+        siv3dPhotonClient.onRoomList = function (rooms) {
+            siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.OnRoomListUpdate });
+        };
+
+        siv3dPhotonClient.onRoomListUpdate = function (rooms, roomsUpdated, roomsAdded, roomsRemoved) {
             siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.OnRoomListUpdate });
         };
 
