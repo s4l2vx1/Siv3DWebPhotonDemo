@@ -366,11 +366,11 @@ void Main()
 			);
 		}
 
-		if (SimpleGUI::Button(U"createRoom", { x += offsetX, y }, ButtonWidth))
+		if (SimpleGUI::Button(U"createRoom (rejoinable)", { x += offsetX, y }, ButtonWidth))
 		{
 			network.createRoom(
 				text.text,
-				RoomCreateOption().maxPlayers(2)
+				RoomCreateOption().maxPlayers(2).rejoinGracePeriod(none)
 			);
 		}
 
@@ -501,7 +501,7 @@ void Main()
 			auto player = network.getLocalPlayer();
 			network.logger(U"getSelf: ");
 			network.logger(U"- userName: {} ({})"_fmt(player.userName, network.getUserName()));
-			network.logger(U"- userID: {} ({})"_fmt(player.userID), network.getUserID());
+			network.logger(U"- userID: {} ({})"_fmt(player.userID, network.getUserID()));
 			network.logger(U"- localID: {} ({})"_fmt(player.localID, network.getLocalPlayerID()));
 			network.logger(U"- isHost: {} ({})"_fmt(player.isHost, network.isHost()));
 			network.logger(U"- isActive: {}"_fmt(player.isActive));
@@ -513,7 +513,7 @@ void Main()
 			auto player = network.getLocalPlayer(hostID);
 			network.logger(U"getHost: ");
 			network.logger(U"- userName: {} {}"_fmt(player.userName, network.getUserName(hostID)));
-			network.logger(U"- userID: {} ({})"_fmt(player.userID), network.getUserID(hostID));
+			network.logger(U"- userID: {} ({})"_fmt(player.userID, network.getUserID()));
 			network.logger(U"- localID: {} ({})"_fmt(player.localID, hostID));
 			network.logger(U"- isHost: {}"_fmt(player.isHost));
 			network.logger(U"- isActive: {}"_fmt(player.isActive));

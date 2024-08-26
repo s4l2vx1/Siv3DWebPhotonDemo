@@ -72,9 +72,7 @@ mergeInto(LibraryManager.library, {
                 siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.JoinRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
             });
             peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.CreateGame, function (data) {
-                if (data.errCode) {
-                    siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.CreateRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
-                }
+                siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.CreateRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
             });
         };
 
@@ -439,15 +437,16 @@ mergeInto(LibraryManager.library, {
     siv3dPhotonCreateRoom__deps: ["$siv3dPhotonClient", "$siv3dPhotonCallbackCode"],
 
     siv3dPhotonLeaveRoom: function (willComeBack) {
-        if (!siv3dPhotonClient.waitingCallback) {
-            siv3dPhotonClient.waitingCallback = siv3dPhotonCallbackCode.LeaveRoomReturn;
-            if (willComeBack) {
-                siv3dPhotonClient.suspendRoom();
-            } else {
-                siv3dPhotonClient.leaveRoom();
-            }
-        } else {
+        if (siv3dPhotonClient.waitingCallback) {
             return;
+        }
+
+        siv3dPhotonClient.waitingCallback = siv3dPhotonCallbackCode.LeaveRoomReturn;
+
+        if (willComeBack) {
+            siv3dPhotonClient.suspendRoom();
+        } else {
+            siv3dPhotonClient.leaveRoom();
         }
     },
     siv3dPhotonLeaveRoom__sig: "vi",

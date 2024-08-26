@@ -882,7 +882,7 @@ namespace s3d
 
 		void leaveRoom(bool willComeBack)
 		{
-			if (m_context.isInRoom())
+			if (not m_context.isInRoom())
 			{
 				return;
 			}
@@ -1296,8 +1296,8 @@ namespace s3d::detail
 		json[U"maxPlayers"] = roomCreateOption.maxPlayers();
 		json[U"customGameProperties"] = roomCreateOption.properties();
 		json[U"propsListedInLobby"] = roomCreateOption.visibleRoomPropertyKeys();
-		json[U"roomTTL"] = roomCreateOption.rejoinGracePeriod().value_or(-1ms).count();
-		json[U"playerTTL"] = roomCreateOption.roomDestroyGracePeriod().count();
+		json[U"playerTTL"] = roomCreateOption.rejoinGracePeriod().value_or(-1ms).count();
+		json[U"roomTTL"] = roomCreateOption.roomDestroyGracePeriod().count();
 
 		return json.formatMinimum();
 	}
