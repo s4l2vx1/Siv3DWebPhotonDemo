@@ -310,69 +310,6 @@ void Main()
 
 		SimpleGUI::TextBox(text, { x, y }, ButtonWidth);
 
-		{
-			String state;
-
-			switch (network.getClientState())
-			{
-			case ClientState::Disconnected:
-				state = U"Disconnected";
-				break;
-			case ClientState::ConnectingToLobby:
-				state = U"ConnectingToLobby";
-				break;
-			case ClientState::InLobby:
-				state = U"InLobby";
-				break;
-			case ClientState::JoiningRoom:
-				state = U"JoiningRoom";
-				break;
-			case ClientState::InRoom:
-				state = U"InRoom";
-				break;
-			case ClientState::LeavingRoom:
-				state = U"LeavingRoom";
-				break;
-			case ClientState::Disconnecting:
-				state = U"Disconnecting";
-				break;
-			}
-
-			font(state).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
-		}
-
-		if (network.isInLobby())
-		{
-			font(U"Online: {}"_fmt(
-				network.getCountPlayersOnline()
-			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
-
-			font(U"InGame: {}"_fmt(
-				network.getCountPlayersIngame()
-			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
-
-			font(U"Room: {}"_fmt(
-				network.getCountGamesRunning()
-			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
-		}
-		else if (network.isInRoom())
-		{
-			font(U"Room: {} [{} / {}]"_fmt(
-				network.getCurrentRoomName(),
-				network.getPlayerCountInCurrentRoom(),
-				network.getMaxPlayersInCurrentRoom()
-			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
-
-			font(U"isOpen: {}"_fmt(
-				network.getIsOpenInCurrentRoom()
-			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
-
-			font(U"isVisible: {}"_fmt(
-				network.getIsVisibleInCurrentRoom()
-			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
-		}
-
-
 		if (SimpleGUI::Button(U"connect", { x = initX, y += offsetY }, ButtonWidth))
 		{
 			network.connect(U"Siv", U"jp");
@@ -720,6 +657,68 @@ void Main()
 		{
 			network.logger(U"SetIsOpenInCurrentRoom: false");
 			network.setIsVisibleInCurrentRoom(false);
+		}
+
+		{
+			String state;
+
+			switch (network.getClientState())
+			{
+			case ClientState::Disconnected:
+				state = U"Disconnected";
+				break;
+			case ClientState::ConnectingToLobby:
+				state = U"ConnectingToLobby";
+				break;
+			case ClientState::InLobby:
+				state = U"InLobby";
+				break;
+			case ClientState::JoiningRoom:
+				state = U"JoiningRoom";
+				break;
+			case ClientState::InRoom:
+				state = U"InRoom";
+				break;
+			case ClientState::LeavingRoom:
+				state = U"LeavingRoom";
+				break;
+			case ClientState::Disconnecting:
+				state = U"Disconnecting";
+				break;
+			}
+
+			font(state).drawAt(Rect{ x = initX, y += offsetY, ButtonWidth, 40 }.center());
+		}
+
+		if (network.isInLobby())
+		{
+			font(U"Online: {}"_fmt(
+				network.getCountPlayersOnline()
+			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
+
+			font(U"InGame: {}"_fmt(
+				network.getCountPlayersIngame()
+			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
+
+			font(U"Room: {}"_fmt(
+				network.getCountGamesRunning()
+			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
+		}
+		else if (network.isInRoom())
+		{
+			font(U"Room: {} [{} / {}]"_fmt(
+				network.getCurrentRoomName(),
+				network.getPlayerCountInCurrentRoom(),
+				network.getMaxPlayersInCurrentRoom()
+			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
+
+			font(U"isOpen: {}"_fmt(
+				network.getIsOpenInCurrentRoom()
+			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
+
+			font(U"isVisible: {}"_fmt(
+				network.getIsVisibleInCurrentRoom()
+			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
 		}
 
 		scrollBar.draw(ColorF(Palette::White).withAlpha(100));

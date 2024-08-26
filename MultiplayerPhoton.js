@@ -116,7 +116,7 @@ mergeInto(LibraryManager.library, {
         };
         
         siv3dPhotonClient.onAppStats = function (errorCode, errorMsg, stats) {
-            siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.AppStateChange, data: stats });
+            siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.AppStateChange, stats: stats });
         };
         
         siv3dPhotonClient.onActorJoin = function (actor) {
@@ -143,13 +143,13 @@ mergeInto(LibraryManager.library, {
 
         siv3dPhotonClient.onMyRoomPropertiesChange = function () {
             siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.OnRoomPropertiesChange });
-        }
+        };
 
         siv3dPhotonClient.onError = function (errorCode, errorMsg) {
             if (errorCode) {
                 siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectionErrorReturn, errCode: errorCode, errMsg: errorMsg });
             }
-        }
+        };
     },
     siv3dPhotonInitClient__sig: "viiii",
     siv3dPhotonInitClient__deps: ["$siv3dPhotonClient", "$siv3dPhotonCallbackCode"],
@@ -243,7 +243,7 @@ mergeInto(LibraryManager.library, {
                 case siv3dPhotonCallbackCode.StateChange:
                     break;
                 case siv3dPhotonCallbackCode.AppStateChange:
-                    _siv3dPhotonAppStateChangeCallback(siv3dPhotonClient.gameCount, siv3dPhotonClient.peerCount, siv3dPhotonClient.masterPeerCount);
+                    _siv3dPhotonAppStateChangeCallback(callback.stats.gameCount, callback.stats.peerCount, callback.stats.masterPeerCount);
                     break;
                 case siv3dPhotonCallbackCode.ActorJoin:
                     siv3dPhotonClient.lastMasterClient = siv3dPhotonClient.myRoomMasterActorNr();
