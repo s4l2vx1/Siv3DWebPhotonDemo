@@ -2039,6 +2039,11 @@ namespace s3d
 			return false;
 		}
 
+		if (m_lastJoinedRoomName.isEmpty())
+		{
+			return false;
+		}
+
 		auto state = getClientState();
 
 		if (state == ClientState::InLobby)
@@ -2389,6 +2394,8 @@ namespace s3d
 		{
 			return;
 		}
+
+		g_detail->m_lastJoinedRoomName = U"";
 
 		detail::siv3dPhotonLeaveRoom(willComeBack);
 	}
