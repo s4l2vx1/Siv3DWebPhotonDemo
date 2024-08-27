@@ -2,170 +2,6 @@
 # include "Multiplayer_Photon.hpp"
 # include "PHOTON_APP_ID.SECRET"
 
-
-struct ScrollBar
-{
-	RectF rect{};
-	Optional<double> dragOffset;
-
-	double viewHeight = 600;
-	double pageHeight = 1000;
-	double viewTop = 0;
-	double viewVelocity = 0;
-
-	double accumulateTime = 0;
-	static constexpr double stepTime = 1.0 / 200;
-	static constexpr double resistance = 10;
-
-	Transition sliderWidthTransition = Transition(0.1s, 0.1s);
-
-	ScrollBar() = default;
-
-	ScrollBar(const RectF& rect, double viewHeight, double pageHeight)
-		: rect(rect)
-		, viewHeight(viewHeight)
-		, pageHeight(pageHeight)
-	{
-
-	}
-
-	ScrollBar(double pageHeight, double viewHeight = Graphics2D::GetRenderTargetSize().y, const RectF& rect = Rect{ Arg::topRight(Graphics2D::GetRenderTargetSize().x - 2, 0), 10 ,Graphics2D::GetRenderTargetSize().y })
-		: rect(rect)
-		, viewHeight(viewHeight)
-		, pageHeight(pageHeight)
-	{
-
-	}
-
-	double sliderHeight() const
-	{
-		return Max(rect.h * viewHeight / pageHeight, 20.0);
-	}
-
-	double sliderYPerViewY() const
-	{
-		return (rect.h - sliderHeight()) / (pageHeight - viewHeight);
-	}
-
-	double sliderY() const
-	{
-		return viewTop * sliderYPerViewY();
-	}
-
-	RectF sliderRect() const
-	{
-		return RectF(rect.x, rect.y + sliderY(), rect.w, sliderHeight());
-	}
-
-	bool existSlider() const
-	{
-		return viewHeight < pageHeight;
-	}
-
-	bool isSliderMouseOver() const
-	{
-		return sliderRect().stretched(5).mouseOver();
-	}
-
-	bool isSliderThick() const
-	{
-		return isSliderMouseOver() || dragOffset;
-	}
-
-	Transformer2D createTransformer() const
-	{
-		return Transformer2D(Mat3x2::Translate(0, -viewTop), TransformCursor::Yes);
-	}
-
-	void scrollBy(double h) {
-		viewVelocity += resistance * h;
-	}
-
-	void scrollTopTo(double y) {
-		scrollBy(y - viewTop);
-	}
-
-	void scrollBottomTo(double y) {
-		scrollBy(y - viewTop - viewHeight);
-	}
-
-	void scrollCenterTo(double y) {
-		scrollBy(y - viewTop - viewHeight / 2);
-	}
-
-	void update(double wheel = Mouse::Wheel(), double delta = Scene::DeltaTime())
-	{
-		if (not existSlider()) {
-			viewTop = 0;
-			viewVelocity = 0;
-			dragOffset.reset();
-			sliderWidthTransition.reset();
-			return;
-		}
-
-		for (accumulateTime += delta; accumulateTime >= stepTime; accumulateTime -= stepTime)
-		{
-			if (not dragOffset) {
-				viewTop += viewVelocity * stepTime;
-			}
-
-			if (viewVelocity != 0)
-			{
-				viewVelocity += -viewVelocity * stepTime * resistance;
-			}
-		}
-
-		if (dragOffset)
-		{
-			const double prevTop = viewTop;
-			viewTop = (Cursor::PosF().y - *dragOffset) / sliderYPerViewY();
-			viewVelocity = (viewTop - prevTop) / delta;
-		}
-
-
-		if (isSliderMouseOver() and MouseL.down())
-		{
-			dragOffset = Cursor::PosF().y - sliderY();
-		}
-		else if (dragOffset && MouseL.up())
-		{
-			dragOffset.reset();
-		}
-
-		if (wheel) {
-			viewVelocity = wheel * 2000;
-		}
-
-		if (viewTop < 0)
-		{
-			viewTop = 0;
-			viewVelocity = 0;
-		}
-		else if (viewTop + viewHeight > pageHeight)
-		{
-			viewTop = pageHeight - viewHeight;
-			viewVelocity = 0;
-		}
-
-		sliderWidthTransition.update(isSliderThick());
-
-	}
-
-	void draw(const ColorF& color = ColorF(Palette::Dimgray).withAlpha(0.8)) const
-	{
-		if (not existSlider()) return;
-
-		double w = rect.w * (sliderWidthTransition.value() * 0.5 + 0.5);
-
-		RectF(rect.x - w + rect.w, rect.y + sliderY(), w, sliderHeight()).rounded(rect.w / 2).draw(color);
-	}
-
-	double progress0_1() {
-		return viewTop / (pageHeight - viewHeight);
-	}
-};
-
-
 // ユーザ定義型
 struct MyData
 {
@@ -212,7 +48,7 @@ public:
 
 	Optional<LocalPlayer> getLocalPlayerByName(StringView userName) const
 	{
-		for (const auto& player : m_localPlayers)
+		for (const auto& player : getLocalPlayers())
 		{
 			if (player.userName == userName)
 			{
@@ -223,8 +59,6 @@ public:
 	}
 
 private:
-
-	Array<LocalPlayer> m_localPlayers;
 
 	void onIntEvent(LocalPlayerID sender, int32 value)
 	{
@@ -275,6 +109,8 @@ private:
 			logger(U"- properties: {}"_fmt(Format(room.properties)));
 		}
 	}
+
+	
 };
 
 void Main()
@@ -285,8 +121,6 @@ void Main()
 	Window::SetStyle(WindowStyle::Sizable);
 
 	MyNetwork network{};
-
-	ScrollBar scrollBar{ 1200 };
 
 	TextEditState text{};
 
@@ -301,7 +135,6 @@ void Main()
 
 	while (System::Update())
 	{
-		scrollBar.update();
 		network.update();
 
 		int x = initX;
@@ -366,7 +199,7 @@ void Main()
 			);
 		}
 
-		if (SimpleGUI::Button(U"createRoom (rejoinable)", { x += offsetX, y }, ButtonWidth))
+		if (SimpleGUI::Button(U"createRoom", { x += offsetX, y }, ButtonWidth))
 		{
 			network.createRoom(
 				text.text,
@@ -391,7 +224,7 @@ void Main()
 
 		if (SimpleGUI::Button(U"joinEventTargetGroup 2, 3", { x += offsetX, y }, ButtonWidth))
 		{
-			network.joinEventTargetGroup({2, 3});
+			network.joinEventTargetGroup({ 2, 3 });
 		}
 
 		if (SimpleGUI::Button(U"joinEventTargetGroup All", { x += offsetX, y }, ButtonWidth))
@@ -401,7 +234,7 @@ void Main()
 
 		if (SimpleGUI::Button(U"leaveEventTargetGroup 1, 2", { x = initX, y += offsetY }, ButtonWidth))
 		{
-			network.leaveEventTargetGroup({1, 2});
+			network.leaveEventTargetGroup({ 1, 2 });
 		}
 
 		if (SimpleGUI::Button(U"leaveEventTargetGroup 3", { x += offsetX, y }, ButtonWidth))
@@ -442,7 +275,7 @@ void Main()
 			auto target = network.getLocalPlayerByName(text.text);
 			if (target)
 			{
-				network.sendEvent(MultiplayerEvent(EventCode::IntEvent, {target.value().localID}), 0);
+				network.sendEvent(MultiplayerEvent(EventCode::IntEvent, { target.value().localID }), 0);
 			}
 		}
 
@@ -452,24 +285,44 @@ void Main()
 			network.sendEvent(MultiplayerEvent(EventCode::StringEvent, EventReceiverOption::Host), String(U"ToHost"));
 		}
 
-		if (SimpleGUI::Button(U"sendEvent CacheUntilLeaveRoom", { x = initX, y += offsetY }, ButtonWidth))
+		if (SimpleGUI::Button(U"sendEvent Others_CacheUntilLeaveRoom", { x = initX, y += offsetY }, ButtonWidth))
 		{
-			network.sendEvent(MultiplayerEvent(EventCode::StringEvent, EventReceiverOption::Others_CacheUntilLeaveRoom), String(U"CacheUntilLeaveRoom"));
+			network.sendEvent(MultiplayerEvent(EventCode::StringEvent, EventReceiverOption::Others_CacheUntilLeaveRoom), String(U"Others_CacheUntilLeaveRoom"));
 		}
 
-		if (SimpleGUI::Button(U"sendEvent CacheForever", { x += offsetX, y }, ButtonWidth))
+		if (SimpleGUI::Button(U"sendEvent Others_CacheForever", { x += offsetX, y }, ButtonWidth))
 		{
-			network.sendEvent(MultiplayerEvent(EventCode::StringEvent, EventReceiverOption::Others_CacheForever), String(U"CacheForever"));
+			network.sendEvent(MultiplayerEvent(EventCode::StringEvent, EventReceiverOption::Others_CacheForever), String(U"Others_CacheForever"));
 		}
 
-		if (SimpleGUI::Button(U"sendEvent CacheUntilLeaveRoom2", { x += offsetX, y }, ButtonWidth))
+		if (SimpleGUI::Button(U"sendEvent All_CacheUntilLeaveRoom", { x += offsetX, y }, ButtonWidth))
 		{
-			network.sendEvent(MultiplayerEvent(EventCode::StringEvent2, EventReceiverOption::Others_CacheUntilLeaveRoom), String(U"CacheUntilLeaveRoom2"));
+			network.sendEvent(MultiplayerEvent(EventCode::StringEvent, EventReceiverOption::All_CacheUntilLeaveRoom), String(U"All_CacheUntilLeaveRoom"));
 		}
 
-		if (SimpleGUI::Button(U"sendEvent CacheForever2", { x += offsetX, y }, ButtonWidth))
+		if (SimpleGUI::Button(U"sendEvent All_CacheForever", { x += offsetX, y }, ButtonWidth))
 		{
-			network.sendEvent(MultiplayerEvent(EventCode::StringEvent2, EventReceiverOption::Others_CacheForever), String(U"CacheForever2"));
+			network.sendEvent(MultiplayerEvent(EventCode::StringEvent, EventReceiverOption::All_CacheForever), String(U"All_CacheForever"));
+		}
+
+		if (SimpleGUI::Button(U"sendEvent Others_CacheUntilLeaveRoom", { x = initX, y += offsetY }, ButtonWidth))
+		{
+			network.sendEvent(MultiplayerEvent(EventCode::StringEvent2, EventReceiverOption::Others_CacheUntilLeaveRoom), String(U"Others_CacheUntilLeaveRoom2"));
+		}
+
+		if (SimpleGUI::Button(U"sendEvent Others_CacheForever", { x += offsetX, y }, ButtonWidth))
+		{
+			network.sendEvent(MultiplayerEvent(EventCode::StringEvent2, EventReceiverOption::Others_CacheForever), String(U"Others_CacheForever2"));
+		}
+
+		if (SimpleGUI::Button(U"sendEvent All_CacheUntilLeaveRoom", { x += offsetX, y }, ButtonWidth))
+		{
+			network.sendEvent(MultiplayerEvent(EventCode::StringEvent2, EventReceiverOption::All_CacheUntilLeaveRoom), String(U"All_CacheUntilLeaveRoom2"));
+		}
+
+		if (SimpleGUI::Button(U"sendEvent All_CacheForever", { x += offsetX, y }, ButtonWidth))
+		{
+			network.sendEvent(MultiplayerEvent(EventCode::StringEvent2, EventReceiverOption::All_CacheForever), String(U"All_CacheForever2"));
 		}
 
 		if (SimpleGUI::Button(U"removeEventCache", { x = initX, y += offsetY }, ButtonWidth))
@@ -484,7 +337,7 @@ void Main()
 
 		if (SimpleGUI::Button(U"removeEventCache All", { x += offsetX, y }, ButtonWidth))
 		{
-			network.removeEventCache(EventCode::StringEvent2, {0});
+			network.removeEventCache(0);
 		}
 
 		if (SimpleGUI::Button(U"removeEventCache Of", { x += offsetX, y }, ButtonWidth))
@@ -492,7 +345,7 @@ void Main()
 			auto target = network.getLocalPlayerByName(text.text);
 			if (target)
 			{
-				network.removeEventCache(EventCode::StringEvent2, {target.value().localID});
+				network.removeEventCache(EventCode::StringEvent, { target.value().localID });
 			}
 		}
 
@@ -587,7 +440,7 @@ void Main()
 
 		if (SimpleGUI::Button(U"RemovePlayerProperty 1, 2", { x += offsetX, y }, ButtonWidth))
 		{
-			network.removePlayerProperty({U"1", U"2"});
+			network.removePlayerProperty({ U"1", U"2" });
 		}
 
 		if (SimpleGUI::Button(U"GetRoomProperties", { x = initX, y += offsetY }, ButtonWidth))
@@ -659,7 +512,7 @@ void Main()
 		}
 
 		{
-			String state;
+			String state {};
 
 			switch (network.getClientState())
 			{
@@ -719,7 +572,5 @@ void Main()
 				network.getIsVisibleInCurrentRoom()
 			)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
 		}
-
-		scrollBar.draw(ColorF(Palette::White).withAlpha(100));
 	}
 }

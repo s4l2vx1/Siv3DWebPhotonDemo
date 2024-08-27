@@ -415,8 +415,8 @@ namespace s3d
 			m_context.logger(U"[Multiplayer_Photon] data: ", size, U" bytes (serialized)");
 
 			Deserializer<MemoryViewReader> reader{ data.getDataCopy(), size };
-			if (m_context.table.contains(eventCode)) {
-				auto& receiver = m_context.table[eventCode];
+			if (m_context.m_table.contains(eventCode)) {
+				auto& receiver = m_context.m_table[eventCode];
 				(receiver.second)(m_context, receiver.first, playerID, reader);
 			}
 			else {
@@ -515,8 +515,8 @@ namespace s3d
 							const auto values = ExitGames::Common::ValueObject<uint8*>(eventDataContent.getValue(L"values")).getDataCopy();
 							const auto length = *(ExitGames::Common::ValueObject<uint8*>(eventDataContent.getValue(L"values"))).getSizes();
 							Deserializer<MemoryViewReader> reader{ values, length };
-							if (m_context.table.contains(eventCode)) {
-								auto& receiver = m_context.table[eventCode];
+							if (m_context.m_table.contains(eventCode)) {
+								auto& receiver = m_context.m_table[eventCode];
 								(receiver.second)(m_context, receiver.first, playerID, reader);
 							}
 							else {
@@ -1031,18 +1031,24 @@ namespace s3d
 			m_context.leaveRoomEventAction(playerID, isSuspended);
 		}
 
-		void customEventAction(LocalPlayerID playerID, uint8 code, char* message)
+		void customEventAction(LocalPlayerID playerID, uint8 eventCode, char* message)
 		{
 			Blob blob = Base64::Decode(message, s3d::SkipValidation::Yes); 
 
 			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::customEventAction(Deserializer<MemoryReader>)");
 			m_context.logger(U"[Multiplayer_Photon] playerID: ", playerID);
-			m_context.logger(U"[Multiplayer_Photon] eventCode: ", code);
+			m_context.logger(U"[Multiplayer_Photon] eventCode: ", eventCode);
 			m_context.logger(U"[Multiplayer_Photon] data: ", blob.size(), U" bytes (serialized)");
 
-			Deserializer<MemoryViewReader> deserializer{blob.data(), blob.size()};
-			
-			m_context.customEventAction(playerID, code, deserializer);
+			Deserializer<MemoryViewReader> reader{blob.data(), blob.size()};
+
+			if (m_context.m_table.contains(eventCode)) {
+				auto& receiver = m_context.m_table[eventCode];
+				(receiver.second)(m_context, receiver.first, playerID, reader);
+			}
+			else {
+				m_context.customEventAction(playerID, eventCode, reader);
+			}
 		}
 
 		void onRoomListUpdate()
@@ -1358,6 +1364,25 @@ namespace s3d::detail
 		{
 			json[U"targetActors"] = targets;
 		}
+
+		return json.formatMinimum();
+	}
+
+	String MultiplayerEventToJSON(EventCaching cache)
+	{
+		JSON json{};
+
+		json[U"cache"] = static_cast<int32>(cache);
+
+		return json.formatMinimum();
+	}
+
+	String MultiplayerEventToJSON(EventCaching cache, const Array<LocalPlayerID>& targets)
+	{
+		JSON json{};
+
+		json[U"cache"] = static_cast<int32>(cache);
+		json[U"targetActors"] = targets;
 
 		return json.formatMinimum();
 	}
@@ -3594,7 +3619,7 @@ namespace s3d
 		detail::siv3dPhotonRaiseEvent(
 			eventCode,
 			nullptr,
-			U"{}"
+			detail::MultiplayerEventToJSON(detail::EventCaching::RemoveFromRoomCache).data()
 		);
 	}
 
@@ -3614,7 +3639,7 @@ namespace s3d
 		detail::siv3dPhotonRaiseEvent(
 			eventCode,
 			nullptr,
-			detail::MultiplayerEventToJSON(targets).data()
+			detail::MultiplayerEventToJSON(detail::EventCaching::RemoveFromRoomCache, targets).data()
 		);
 	}
 
@@ -3895,7 +3920,7 @@ namespace s3d
 
 	void Multiplayer_Photon::removePlayerProperty(StringView key)
 	{
-		removePlayerProperty({ key });
+		removePlayerProperty(Array<String>{ String(key) });
 	}
 
 	void Multiplayer_Photon::removePlayerProperty(const Array<String>& keys)

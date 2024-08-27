@@ -461,7 +461,7 @@ mergeInto(LibraryManager.library, {
     siv3dPhotonChangeInterestGroup__deps: ["$siv3dPhotonClient"],
 
     siv3dPhotonRaiseEvent: function (eventCode, data_ptr, opt) {
-        return siv3dPhotonClient.raiseEvent(eventCode, data_ptr ? UTF8ToString(data_ptr) : "", JSON.parse(UTF32ToString(opt)));
+        return siv3dPhotonClient.raiseEvent(eventCode, data_ptr ? UTF8ToString(data_ptr) : null, JSON.parse(UTF32ToString(opt)));
     },
     siv3dPhotonRaiseEvent__sig: "viii",
     siv3dPhotonRaiseEvent__deps: ["$siv3dPhotonClient", "$UTF32ToString"],

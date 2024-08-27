@@ -1365,7 +1365,7 @@ namespace s3d
 
 		Optional<String> m_requestedRegion;
 
-		HashTable<uint8, detail::CustomEventReceiver> table;
+		HashTable<uint8, detail::CustomEventReceiver> m_table;
 
 		std::function<void(StringView)> m_logger;
 	};
@@ -1414,7 +1414,7 @@ namespace s3d
 			throw Error{ U"[Multiplayer_Photon] EventCode must be in a range of 1 to 199" };
 		}
 
-		table[static_cast<uint8>(eventCode)] = detail::CustomEventReceiver(reinterpret_cast<detail::TypeErasedCallback>(callback), &detail::WrapperImpl<T, Args...>::wrapper);
+		m_table[static_cast<uint8>(eventCode)] = detail::CustomEventReceiver(reinterpret_cast<detail::TypeErasedCallback>(callback), &detail::WrapperImpl<T, Args...>::wrapper);
 	}
 
 	template<class EventCode>
