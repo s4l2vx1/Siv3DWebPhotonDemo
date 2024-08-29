@@ -569,14 +569,9 @@ namespace s3d
 		{
 			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::connectReturn()");
 			m_context.logger(U"[Multiplayer_Photon] region: ", detail::ToString(region));
+			m_context.logger(U"- [Multiplayer_Photon] cluster: ", detail::ToString(cluster));
 
 			detail::LogIfError(m_context, errorCode, detail::ToString(errorString));
-
-			if (not errorCode)
-			{
-				m_context.logger(U"- [Multiplayer_Photon] region: ", detail::ToString(region));
-				m_context.logger(U"- [Multiplayer_Photon] cluster: ", detail::ToString(cluster));
-			}
 
 			m_context.connectReturn(errorCode, detail::ToString(errorString), detail::ToString(region), detail::ToString(cluster));
 		}
@@ -655,23 +650,41 @@ namespace s3d
 			m_context.onRoomListUpdate();
 		}
 
-		void onRoomPropertiesChange(const ExitGames::Common::Hashtable& changes) override
+		void onRoomPropertiesChange(const ExitGames::Common::Hashtable& changes_) override
 		{
-			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::onRoomPropertiesChange()");
+			auto changes = detail::PhotonHashtableToStringHashTable(changes_);
 
-			m_context.onRoomPropertiesChange(detail::PhotonHashtableToStringHashTable(changes));
+			if (changes.size() == 0)
+			{
+				return;
+			}
+
+			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::onRoomPropertiesChange()");
+			m_context.logger(U"[Multiplayer_Photon] - changes: {}"_fmt(Format(changes)));
+
+			m_context.onRoomPropertiesChange(changes);
 		}
 
-		void onPlayerPropertiesChange(const int playerID, const ExitGames::Common::Hashtable& changes) override
+		void onPlayerPropertiesChange(const int playerID, const ExitGames::Common::Hashtable& changes_) override
 		{
-			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::onPlayerPropertiesChange()");
+			auto changes = detail::PhotonHashtableToStringHashTable(changes_);
 
-			m_context.onPlayerPropertiesChange(playerID, detail::PhotonHashtableToStringHashTable(changes));
+			if (changes.size() == 0)
+			{
+				return;
+			}
+			
+			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::onPlayerPropertiesChange()");
+			m_context.logger(U"[Multiplayer_Photon] - changes: {}"_fmt(Format(changes)));
+
+			m_context.onPlayerPropertiesChange(playerID, changes);
 		}
 
 		void onMasterClientChanged(const int newHostID, const int oldHostID) override
 		{
-			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::onMasterClientChanged()");
+			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::onHostChange()");
+			m_context.logger(U"[Multiplayer_Photon] - netHostID: {}"_fmt(newHostID));
+			m_context.logger(U"[Multiplayer_Photon] - oldHostID: {}"_fmt(oldHostID));
 
 			m_context.onHostChange(newHostID, oldHostID);
 		}
@@ -710,6 +723,9 @@ namespace s3d::detail
 		__attribute__((import_name("siv3dPhotonService")))
 		void siv3dPhotonService();
 
+		__attribute__((import_name("siv3dPhotonPing")))
+		void siv3dPhotonPing();
+
 		__attribute__((import_name("siv3dPhotonIsInLobby")))
 		bool siv3dPhotonIsInLobby();
 
@@ -721,6 +737,9 @@ namespace s3d::detail
 
 		__attribute__((import_name("siv3dPhotonGetRoundTripTime")))
 		int32 siv3dPhotonGetRoundTripTime();
+
+		__attribute__((import_name("siv3dPhotonSetPingInterval")))
+		void siv3dPhotonSetPingInterval(int32 interval);
 
 		__attribute__((import_name("siv3dPhotonJoinRandomRoom")))
 		bool siv3dPhotonJoinRandomRoom(uint8 maxPlayers, MatchmakingMode matchmakingMode, const char32* filter);
@@ -760,6 +779,9 @@ namespace s3d::detail
 
 		__attribute__((import_name("siv3dPhotonGetRoomPlayerIDList")))
 		void siv3dPhotonGetRoomPlayerIDList(Array<LocalPlayerID>* array);
+
+		__attribute__((import_name("siv3dPhotonGetIsVisibleInCurrentRoom")))
+		bool siv3dPhotonGetIsVisibleInCurrentRoom();
 
 		__attribute__((import_name("siv3dPhotonSetCurrentRoomVisible")))
 		void siv3dPhotonSetCurrentRoomVisible(bool isVisible);
@@ -833,7 +855,7 @@ namespace s3d
 
 		RoomInfo m_currentRoom;
 
-		bool m_isVisibleInCurrentRoom;
+		int32 m_pingInterval = 2000;
 
 		bool joinRandomRoom(const int32 expectedMaxPlayers, MatchmakingMode matchmakingMode, StringView filter)
 		{
@@ -890,11 +912,6 @@ namespace s3d
 			m_clientState = ClientState::LeavingRoom;
 
 			detail::siv3dPhotonLeaveRoom(willComeBack);
-		}
-
-		bool reconnectAndRejoin()
-		{
-			return detail::siv3dPhotonReconnectAndRejoin();
 		}
 
 		void updateLocalPlayer()
@@ -1074,9 +1091,20 @@ namespace s3d
 
 		void onMasterClientChanged(const int newHostID, const int oldHostID)
 		{
-			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::onMasterClientChanged()");
+			m_context.logger(U"[Multiplayer_Photon] Multiplayer_Photon::onHostChange()");
 
 			m_context.onHostChange(newHostID, oldHostID);
+		}
+
+		int32 getTimePingInterval()
+		{
+			return m_pingInterval;
+		}
+
+		void setTimePingInterval(int32 interval)
+		{
+			m_pingInterval = interval;
+			detail::siv3dPhotonSetPingInterval(interval);
 		}
 	};
 }
@@ -1086,6 +1114,18 @@ static Multiplayer_Photon::PhotonDetail* g_detail = nullptr;
 // [WEB] extern C callback functions
 namespace s3d::detail
 {
+	enum class PhotonCallbackCode : uint8 {
+    	ConnectionErrorReturn = 1,
+    	ConnectReturn = 11,
+    	DisconnectReturn = 12,
+    	LeaveRoomReturn = 21,
+    	JoinRandomRoomReturn = 22,
+    	JoinRandomOrCreateRoomReturn = 23,
+    	JoinRoomReturn = 24,
+        JoinOrCreateRoomReturn = 25,
+    	CreateRoomReturn = 26,
+	};
+
 	extern "C"
 	{
 		__attribute__((used, export_name("siv3dPhotonGetRoomListCallback")))
@@ -1115,18 +1155,6 @@ namespace s3d::detail
 		{
 			array->push_back(id);
 		}
-
-		enum class PhotonCallbackCode : uint8 {
-        	ConnectionErrorReturn = 1,
-        	ConnectReturn = 11,
-        	DisconnectReturn = 12,
-        	LeaveRoomReturn = 21,
-        	JoinRandomRoomReturn = 22,
-        	JoinRandomOrCreateRoomReturn = 23,
-        	JoinRoomReturn = 24,
-	        JoinOrCreateRoomReturn = 25,
-        	CreateRoomReturn = 26,
-    	};
 
 		__attribute__((used, export_name("siv3dPhotonGeneralCallback")))
 		void siv3dPhotonGeneralCallback(uint8 callback, int32 errorCode, char32* errorString_, LocalPlayerID player)
@@ -1810,6 +1838,26 @@ namespace s3d
 		return m_client->getRoundTripTime();
 	}
 
+	int32 Multiplayer_Photon::getPingIntervalMillisec() const
+	{
+		if (not m_client)
+		{
+			return 0;
+		}
+
+		return m_client->getTimePingInterval();
+	}
+
+	void Multiplayer_Photon::setPingIntervalMillisec(int32 intervalMillisec)
+	{	
+		if (not m_client)
+		{
+			return;
+		}
+
+		return m_client->setTimePingInterval(intervalMillisec);
+	}
+
 	int32 Multiplayer_Photon::getBytesIn() const
 	{
 		if (not m_client)
@@ -1987,7 +2035,20 @@ namespace s3d
 			return false;
 		}
 
-		return detail::siv3dPhotonReconnectAndRejoin();
+		auto state = getClientState();
+
+		if (state == ClientState::InLobby)
+		{
+			constexpr bool rejoin = true;
+			return m_client->opJoinRoom(detail::ToJString(m_lastJoinedRoomName), rejoin);
+		}
+
+		if (state == ClientState::Disconnected)
+		{
+			return m_client->reconnectAndRejoin();
+		}
+
+		return false;
 	}
 
 	void Multiplayer_Photon::joinEventTargetGroup(uint8 targetGroup)
@@ -2318,7 +2379,7 @@ namespace s3d
 			return false;
 		}
 
-		return m_detail->reconnectAndRejoin();
+		return detail::siv3dPhotonReconnectAndRejoin();
 	}
 
 	int32 Multiplayer_Photon::getServerTimeMillisec() const
@@ -2349,6 +2410,25 @@ namespace s3d
 		}
 
 		return detail::siv3dPhotonGetRoundTripTime();
+	}
+
+	int32 Multiplayer_Photon::getPingIntervalMillisec() const
+	{
+		if (not m_detail)
+		{
+			return 0;
+		}
+
+		return m_detail->getTimePingInterval();
+	}
+
+	void Multiplayer_Photon::setPingIntervalMillisec(int32 intervalMillisec)
+	{	
+		if (not m_detail) {
+			return;
+		}
+
+		return m_detail->setTimePingInterval(intervalMillisec);
 	}
 
 	int32 Multiplayer_Photon::getCountGamesRunning() const
@@ -3836,7 +3916,7 @@ namespace s3d
 
 	bool Multiplayer_Photon::getIsVisibleInCurrentRoom() const
 	{
-		return m_detail->m_isVisibleInCurrentRoom;
+		return detail::siv3dPhotonGetIsVisibleInCurrentRoom();
 	}
 
 	void Multiplayer_Photon::setIsOpenInCurrentRoom(const bool isOpen)
@@ -3876,7 +3956,13 @@ namespace s3d
 			return {};
 		}
 
-		return detail::siv3dPhotonGetPlayerCustomProperty(key.data(), localPlayerID);
+		char32* result = detail::siv3dPhotonGetPlayerCustomProperty(key.data(), localPlayerID);
+
+		String ret { result ? result : U"" };
+
+		free(result);
+
+		return ret;
 	}
 
 	HashTable<String, String> Multiplayer_Photon::getPlayerProperties() const
@@ -3957,7 +4043,13 @@ namespace s3d
 			return {};
 		}
 
-		return detail::siv3dPhotonGetRoomCustomProperty(key.data());
+		char32* result = detail::siv3dPhotonGetRoomCustomProperty(key.data());
+
+		String ret { result ? result : U"" };
+
+		free(result);
+
+		return ret;
 	}
 
 	HashTable<String, String> Multiplayer_Photon::getRoomProperties() const
@@ -3996,7 +4088,7 @@ namespace s3d
 
 	void Multiplayer_Photon::removeRoomProperty(StringView key)
 	{
-		removeRoomProperty({ key });
+		removeRoomProperty(Array<String>{ String(key) });
 	}
 
 	void Multiplayer_Photon::removeRoomProperty(const Array<String>& keys)

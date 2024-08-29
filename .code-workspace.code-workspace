@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"name": "Siv3DWebPhotonDemo",
+			"path": "."
+		},
+		{
+			"path": "../../shared"
+		}
+	],
+	"settings": {}
+}

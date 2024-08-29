@@ -109,8 +109,6 @@ private:
 			logger(U"- properties: {}"_fmt(Format(room.properties)));
 		}
 	}
-
-	
 };
 
 void Main()
@@ -141,6 +139,16 @@ void Main()
 		int y = initY;
 
 		SimpleGUI::TextBox(text, { x, y }, ButtonWidth);
+
+# if not SIV3D_PLATFORM(WEB)
+		font(U"bytesIn: {}"_fmt(
+			network.getBytesIn()
+		)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
+
+		font(U"bytesOut: {}"_fmt(
+			network.getBytesOut()
+		)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
+# endif
 
 		if (SimpleGUI::Button(U"connect", { x = initX, y += offsetY }, ButtonWidth))
 		{
@@ -174,14 +182,24 @@ void Main()
 			network.logger(U"ping: {}ms"_fmt(Format(network.getPingMillisec())));
 		}
 
-# if not SIV3D_PLATFORM(WEB)
-		font(U"bytesIn: {}"_fmt(
-			network.getBytesIn()
-		)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
-		font(U"bytesOut: {}"_fmt(
-			network.getBytesOut()
-		)).drawAt(Rect{ x += offsetX, y, ButtonWidth, 40 }.center());
-# endif
+		if (SimpleGUI::Button(U"getPingInterval", { x += offsetX, y }, ButtonWidth))
+		{
+			network.logger(U"getPingInterval: {}ms"_fmt(network.getPingIntervalMillisec()));
+		}
+
+		if (SimpleGUI::Button(U"setPingInterval", { x += offsetX, y }, ButtonWidth))
+		{
+			Optional<int32> parse = ParseOpt<int32>(text.text);
+			if (parse)
+			{
+				network.logger(U"setPingInterval: {}ms"_fmt(parse.value()));
+				network.setPingIntervalMillisec(parse.value());
+			}
+			else
+			{
+				network.logger(U"setPingInterval: invalid value");
+			}
+		}
 
 		if (SimpleGUI::Button(U"joinRandomOrCreateRoom", { x = initX, y += offsetY }, ButtonWidth))
 		{
@@ -360,6 +378,11 @@ void Main()
 			network.logger(U"- isActive: {}"_fmt(player.isActive));
 		}
 
+		if (SimpleGUI::Button(U"setName", { x += offsetX, y }, ButtonWidth))
+		{
+			network.setUserName(text.text);
+		}
+
 		if (SimpleGUI::Button(U"getHost", { x = initX, y += offsetY }, ButtonWidth))
 		{
 			auto hostID = network.getHostLocalPlayerID();
@@ -374,7 +397,16 @@ void Main()
 
 		if (SimpleGUI::Button(U"setHost", { x += offsetX, y }, ButtonWidth))
 		{
-			network.setHost(network.getLocalPlayerByName(text.text).value().localID);
+			auto target = network.getLocalPlayerByName(text.text);
+			if (target)
+			{
+				network.logger(U"setHost: ");
+				network.setHost(target.value().localID);
+			}
+			else
+			{
+				network.logger(U"setHost: player not found");
+			}
 		}
 
 		if (SimpleGUI::Button(U"getRoom", { x = initX, y += offsetY }, ButtonWidth))
@@ -408,10 +440,10 @@ void Main()
 
 		if (SimpleGUI::Button(U"GetPlayerProperties Of", { x += offsetX, y }, ButtonWidth))
 		{
-			auto player = network.getLocalPlayerByName(text.text);
-			if (player)
+			auto target = network.getLocalPlayerByName(text.text);
+			if (target)
 			{
-				auto playerID = player.value().localID;
+				auto playerID = target.value().localID;
 				auto properties = network.getPlayerProperties(playerID);
 				network.logger(U"GetPlayerProperties: ");
 				network.logger(U"- properties: {}"_fmt(Format(properties)));
@@ -512,7 +544,7 @@ void Main()
 		}
 
 		{
-			String state {};
+			String state{};
 
 			switch (network.getClientState())
 			{

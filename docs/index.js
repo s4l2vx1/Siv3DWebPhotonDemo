@@ -6489,17 +6489,17 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  1536508: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
- 1536560: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
- 1536612: () => { if (typeof(AudioContext) !== 'undefined') { return true; } else if (typeof(webkitAudioContext) !== 'undefined') { return true; } return false; },  
- 1536759: () => { if ((typeof(navigator.mediaDevices) !== 'undefined') && (typeof(navigator.mediaDevices.getUserMedia) !== 'undefined')) { return true; } else if (typeof(navigator.webkitGetUserMedia) !== 'undefined') { return true; } return false; },  
- 1536993: ($0) => { if(typeof(Module['SDL2']) === 'undefined') { Module['SDL2'] = {}; } var SDL2 = Module['SDL2']; if (!$0) { SDL2.audio = {}; } else { SDL2.capture = {}; } if (!SDL2.audioContext) { if (typeof(AudioContext) !== 'undefined') { SDL2.audioContext = new AudioContext(); } else if (typeof(webkitAudioContext) !== 'undefined') { SDL2.audioContext = new webkitAudioContext(); } if (SDL2.audioContext) { autoResumeAudioContext(SDL2.audioContext); } } return SDL2.audioContext === undefined ? -1 : 0; },  
- 1537486: () => { var SDL2 = Module['SDL2']; return SDL2.audioContext.sampleRate; },  
- 1537554: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; var have_microphone = function(stream) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); SDL2.capture.silenceTimer = undefined; } SDL2.capture.mediaStreamNode = SDL2.audioContext.createMediaStreamSource(stream); SDL2.capture.scriptProcessorNode = SDL2.audioContext.createScriptProcessor($1, $0, 1); SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) { if ((SDL2 === undefined) || (SDL2.capture === undefined)) { return; } audioProcessingEvent.outputBuffer.getChannelData(0).fill(0.0); SDL2.capture.currentCaptureBuffer = audioProcessingEvent.inputBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.mediaStreamNode.connect(SDL2.capture.scriptProcessorNode); SDL2.capture.scriptProcessorNode.connect(SDL2.audioContext.destination); SDL2.capture.stream = stream; }; var no_microphone = function(error) { }; SDL2.capture.silenceBuffer = SDL2.audioContext.createBuffer($0, $1, SDL2.audioContext.sampleRate); SDL2.capture.silenceBuffer.getChannelData(0).fill(0.0); var silence_callback = function() { SDL2.capture.currentCaptureBuffer = SDL2.capture.silenceBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.silenceTimer = setTimeout(silence_callback, ($1 / SDL2.audioContext.sampleRate) * 1000); if ((navigator.mediaDevices !== undefined) && (navigator.mediaDevices.getUserMedia !== undefined)) { navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(have_microphone).catch(no_microphone); } else if (navigator.webkitGetUserMedia !== undefined) { navigator.webkitGetUserMedia({ audio: true, video: false }, have_microphone, no_microphone); } },  
- 1539206: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; SDL2.audio.scriptProcessorNode = SDL2.audioContext['createScriptProcessor']($1, 0, $0); SDL2.audio.scriptProcessorNode['onaudioprocess'] = function (e) { if ((SDL2 === undefined) || (SDL2.audio === undefined)) { return; } SDL2.audio.currentOutputBuffer = e['outputBuffer']; dynCall('vi', $2, [$3]); }; SDL2.audio.scriptProcessorNode['connect'](SDL2.audioContext['destination']); },  
- 1539616: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.capture.currentCaptureBuffer.getChannelData(c); if (channelData.length != $1) { throw 'Web Audio capture buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } if (numChannels == 1) { for (var j = 0; j < $1; ++j) { setValue($0 + (j * 4), channelData[j], 'float'); } } else { for (var j = 0; j < $1; ++j) { setValue($0 + (((j * numChannels) + c) * 4), channelData[j], 'float'); } } } },  
- 1540221: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.audio.currentOutputBuffer['numberOfChannels']; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.audio.currentOutputBuffer['getChannelData'](c); if (channelData.length != $1) { throw 'Web Audio output buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } for (var j = 0; j < $1; ++j) { channelData[j] = HEAPF32[$0 + ((j*numChannels + c) << 2) >> 2]; } } },  
- 1540701: ($0) => { var SDL2 = Module['SDL2']; if ($0) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); } if (SDL2.capture.stream !== undefined) { var tracks = SDL2.capture.stream.getAudioTracks(); for (var i = 0; i < tracks.length; i++) { SDL2.capture.stream.removeTrack(tracks[i]); } SDL2.capture.stream = undefined; } if (SDL2.capture.scriptProcessorNode !== undefined) { SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) {}; SDL2.capture.scriptProcessorNode.disconnect(); SDL2.capture.scriptProcessorNode = undefined; } if (SDL2.capture.mediaStreamNode !== undefined) { SDL2.capture.mediaStreamNode.disconnect(); SDL2.capture.mediaStreamNode = undefined; } if (SDL2.capture.silenceBuffer !== undefined) { SDL2.capture.silenceBuffer = undefined } SDL2.capture = undefined; } else { if (SDL2.audio.scriptProcessorNode != undefined) { SDL2.audio.scriptProcessorNode.disconnect(); SDL2.audio.scriptProcessorNode = undefined; } SDL2.audio = undefined; } if ((SDL2.audioContext !== undefined) && (SDL2.audio === undefined) && (SDL2.capture === undefined)) { SDL2.audioContext.close(); SDL2.audioContext = undefined; } }
+  1537628: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
+ 1537680: () => { setTimeout(function() { _siv3dMaybeAwake(); }, 0) },  
+ 1537732: () => { if (typeof(AudioContext) !== 'undefined') { return true; } else if (typeof(webkitAudioContext) !== 'undefined') { return true; } return false; },  
+ 1537879: () => { if ((typeof(navigator.mediaDevices) !== 'undefined') && (typeof(navigator.mediaDevices.getUserMedia) !== 'undefined')) { return true; } else if (typeof(navigator.webkitGetUserMedia) !== 'undefined') { return true; } return false; },  
+ 1538113: ($0) => { if(typeof(Module['SDL2']) === 'undefined') { Module['SDL2'] = {}; } var SDL2 = Module['SDL2']; if (!$0) { SDL2.audio = {}; } else { SDL2.capture = {}; } if (!SDL2.audioContext) { if (typeof(AudioContext) !== 'undefined') { SDL2.audioContext = new AudioContext(); } else if (typeof(webkitAudioContext) !== 'undefined') { SDL2.audioContext = new webkitAudioContext(); } if (SDL2.audioContext) { autoResumeAudioContext(SDL2.audioContext); } } return SDL2.audioContext === undefined ? -1 : 0; },  
+ 1538606: () => { var SDL2 = Module['SDL2']; return SDL2.audioContext.sampleRate; },  
+ 1538674: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; var have_microphone = function(stream) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); SDL2.capture.silenceTimer = undefined; } SDL2.capture.mediaStreamNode = SDL2.audioContext.createMediaStreamSource(stream); SDL2.capture.scriptProcessorNode = SDL2.audioContext.createScriptProcessor($1, $0, 1); SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) { if ((SDL2 === undefined) || (SDL2.capture === undefined)) { return; } audioProcessingEvent.outputBuffer.getChannelData(0).fill(0.0); SDL2.capture.currentCaptureBuffer = audioProcessingEvent.inputBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.mediaStreamNode.connect(SDL2.capture.scriptProcessorNode); SDL2.capture.scriptProcessorNode.connect(SDL2.audioContext.destination); SDL2.capture.stream = stream; }; var no_microphone = function(error) { }; SDL2.capture.silenceBuffer = SDL2.audioContext.createBuffer($0, $1, SDL2.audioContext.sampleRate); SDL2.capture.silenceBuffer.getChannelData(0).fill(0.0); var silence_callback = function() { SDL2.capture.currentCaptureBuffer = SDL2.capture.silenceBuffer; dynCall('vi', $2, [$3]); }; SDL2.capture.silenceTimer = setTimeout(silence_callback, ($1 / SDL2.audioContext.sampleRate) * 1000); if ((navigator.mediaDevices !== undefined) && (navigator.mediaDevices.getUserMedia !== undefined)) { navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(have_microphone).catch(no_microphone); } else if (navigator.webkitGetUserMedia !== undefined) { navigator.webkitGetUserMedia({ audio: true, video: false }, have_microphone, no_microphone); } },  
+ 1540326: ($0, $1, $2, $3) => { var SDL2 = Module['SDL2']; SDL2.audio.scriptProcessorNode = SDL2.audioContext['createScriptProcessor']($1, 0, $0); SDL2.audio.scriptProcessorNode['onaudioprocess'] = function (e) { if ((SDL2 === undefined) || (SDL2.audio === undefined)) { return; } SDL2.audio.currentOutputBuffer = e['outputBuffer']; dynCall('vi', $2, [$3]); }; SDL2.audio.scriptProcessorNode['connect'](SDL2.audioContext['destination']); },  
+ 1540736: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.capture.currentCaptureBuffer.numberOfChannels; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.capture.currentCaptureBuffer.getChannelData(c); if (channelData.length != $1) { throw 'Web Audio capture buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } if (numChannels == 1) { for (var j = 0; j < $1; ++j) { setValue($0 + (j * 4), channelData[j], 'float'); } } else { for (var j = 0; j < $1; ++j) { setValue($0 + (((j * numChannels) + c) * 4), channelData[j], 'float'); } } } },  
+ 1541341: ($0, $1) => { var SDL2 = Module['SDL2']; var numChannels = SDL2.audio.currentOutputBuffer['numberOfChannels']; for (var c = 0; c < numChannels; ++c) { var channelData = SDL2.audio.currentOutputBuffer['getChannelData'](c); if (channelData.length != $1) { throw 'Web Audio output buffer length mismatch! Destination size: ' + channelData.length + ' samples vs expected ' + $1 + ' samples!'; } for (var j = 0; j < $1; ++j) { channelData[j] = HEAPF32[$0 + ((j*numChannels + c) << 2) >> 2]; } } },  
+ 1541821: ($0) => { var SDL2 = Module['SDL2']; if ($0) { if (SDL2.capture.silenceTimer !== undefined) { clearTimeout(SDL2.capture.silenceTimer); } if (SDL2.capture.stream !== undefined) { var tracks = SDL2.capture.stream.getAudioTracks(); for (var i = 0; i < tracks.length; i++) { SDL2.capture.stream.removeTrack(tracks[i]); } SDL2.capture.stream = undefined; } if (SDL2.capture.scriptProcessorNode !== undefined) { SDL2.capture.scriptProcessorNode.onaudioprocess = function(audioProcessingEvent) {}; SDL2.capture.scriptProcessorNode.disconnect(); SDL2.capture.scriptProcessorNode = undefined; } if (SDL2.capture.mediaStreamNode !== undefined) { SDL2.capture.mediaStreamNode.disconnect(); SDL2.capture.mediaStreamNode = undefined; } if (SDL2.capture.silenceBuffer !== undefined) { SDL2.capture.silenceBuffer = undefined } SDL2.capture = undefined; } else { if (SDL2.audio.scriptProcessorNode != undefined) { SDL2.audio.scriptProcessorNode.disconnect(); SDL2.audio.scriptProcessorNode = undefined; } SDL2.audio = undefined; } if ((SDL2.audioContext !== undefined) && (SDL2.audio === undefined) && (SDL2.capture === undefined)) { SDL2.audioContext.close(); SDL2.audioContext = undefined; } }
 };
 
 
@@ -14968,6 +14968,10 @@ var ASM_CONSTS = {
           if (isOpen_ptr != 0) setValue(isOpen_ptr, room.isOpen, "i8");
       }
 
+  function _siv3dPhotonGetIsVisibleInCurrentRoom() {
+          return siv3dPhotonClient.myActor().getRoom().isVisible;
+      }
+
   function _siv3dPhotonGetMasterClientID() {
           return siv3dPhotonClient.myRoomMasterActorNr();
       }
@@ -15061,6 +15065,13 @@ var ASM_CONSTS = {
       }
 
   var siv3dPhotonClientState = {Disconnected:0,ConnectingToLobby:1,InLobby:2,JoiningRoom:3,InRoom:4,LeavingRoom:5,Disconnecting:6};
+  
+  function siv3dPhotonSetPingInterval(interval) {
+          clearInterval(siv3dPhotonClient.pingInterval);
+          siv3dPhotonClient.pingInterval = setInterval(function () {
+              siv3dPhotonClient.updateRtt();
+          }, interval);
+      }
   function _siv3dPhotonInitClient(appID_ptr, appVersion_ptr, verbose, protocol) {
           const appID = UTF32ToString(appID_ptr);
           const appVersion = UTF32ToString(appVersion_ptr);
@@ -15086,6 +15097,10 @@ var ASM_CONSTS = {
           const initMasterPeer_ = Photon.LoadBalancing.LoadBalancingClient.prototype.initMasterPeer;
           Photon.LoadBalancing.LoadBalancingClient.prototype.initMasterPeer = function (peer) {
               initMasterPeer_.call(this, peer);
+  
+              peer.addPeerStatusListener(Photon.PhotonPeer.StatusCodes.connect, function () {
+                  siv3dPhotonClient.masterPeer.ping(true);
+              });
       
               peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.JoinRandomGame, function (data) {
                   siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.JoinRandomRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
@@ -15147,7 +15162,13 @@ var ASM_CONSTS = {
           
           siv3dPhotonClient.onActorLeave = function (actor, cleanup) {
               if (!cleanup) {
-                  siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ActorLeave, actor: actor });
+                  siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ActorLeave, actorNr: actor.actorNr, isSuspended: false });
+              }
+          };
+          
+          siv3dPhotonClient.onActorSuspend = function (actor) {
+              if (!cleanup) {
+                  siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ActorLeave, actorNr: actor.actorNr, isSuspended: true });
               }
           };
           
@@ -15176,6 +15197,8 @@ var ASM_CONSTS = {
                   siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectionErrorReturn, errCode: errorCode, errMsg: errorMsg });
               }
           };
+  
+          siv3dPhotonSetPingInterval(2000);
       }
 
   function _siv3dPhotonJoinRandomOrCreateRoom(roomName_ptr, opt_ptr, maxPlayers, matchmakingMode, filter_ptr) {
@@ -15375,7 +15398,7 @@ var ASM_CONSTS = {
                       _siv3dPhotonActorJoinCallback(callback.actorNr, callback.myself);
                       break;
                   case siv3dPhotonCallbackCode.ActorLeave:
-                      _siv3dPhotonActorLeaveCallback(callback.actor.actorNr, callback.actor.isSuspended);
+                      _siv3dPhotonActorLeaveCallback(callback.actorNr, callback.isSuspended);
                       break;
                   case siv3dPhotonCallbackCode.CustomEvent:
                       _siv3dPhotonCustomEventCallback(callback.actorNr, callback.eventCode, stringToNewUTF8(callback.message));
@@ -15414,6 +15437,12 @@ var ASM_CONSTS = {
   function _siv3dPhotonSetMasterClient(localPlayerID) {
           siv3dPhotonClient.myActor().getRoom().setMasterClient(localPlayerID);
       }
+
+  /** @type {function(...*):?} */
+  function _siv3dPhotonSetPingInterval(
+  ) {
+  err('missing function: siv3dPhotonSetPingInterval'); abort(-1);
+  }
 
   function _siv3dPhotonSetPlayerCustomProperty(key_ptr, value_ptr) {
           siv3dPhotonClient.myActor().setCustomProperty(UTF32ToString(key_ptr), UTF32ToString(value_ptr));
@@ -17153,6 +17182,7 @@ var asmLibraryArg = {
   "siv3dPhotonCreateRoom": _siv3dPhotonCreateRoom,
   "siv3dPhotonDisconnect": _siv3dPhotonDisconnect,
   "siv3dPhotonGetCurrentRoom": _siv3dPhotonGetCurrentRoom,
+  "siv3dPhotonGetIsVisibleInCurrentRoom": _siv3dPhotonGetIsVisibleInCurrentRoom,
   "siv3dPhotonGetMasterClientID": _siv3dPhotonGetMasterClientID,
   "siv3dPhotonGetPlayerCustomProperties": _siv3dPhotonGetPlayerCustomProperties,
   "siv3dPhotonGetPlayerCustomProperty": _siv3dPhotonGetPlayerCustomProperty,
@@ -17177,6 +17207,7 @@ var asmLibraryArg = {
   "siv3dPhotonSetCurrentRoomOpen": _siv3dPhotonSetCurrentRoomOpen,
   "siv3dPhotonSetCurrentRoomVisible": _siv3dPhotonSetCurrentRoomVisible,
   "siv3dPhotonSetMasterClient": _siv3dPhotonSetMasterClient,
+  "siv3dPhotonSetPingInterval": _siv3dPhotonSetPingInterval,
   "siv3dPhotonSetPlayerCustomProperty": _siv3dPhotonSetPlayerCustomProperty,
   "siv3dPhotonSetRoomCustomProperty": _siv3dPhotonSetRoomCustomProperty,
   "siv3dPhotonSetUserName": _siv3dPhotonSetUserName,
@@ -19108,6 +19139,7 @@ var unexportedRuntimeSymbols = [
   'siv3dPhotonClient',
   'siv3dPhotonCallbackCode',
   'siv3dPhotonClientState',
+  'siv3dPhotonSetPingInterval',
 ];
 unexportedRuntimeSymbols.forEach(unexportedRuntimeSymbol);
 var missingLibrarySymbols = [

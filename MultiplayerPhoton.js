@@ -64,6 +64,10 @@ mergeInto(LibraryManager.library, {
         const initMasterPeer_ = Photon.LoadBalancing.LoadBalancingClient.prototype.initMasterPeer;
         Photon.LoadBalancing.LoadBalancingClient.prototype.initMasterPeer = function (peer) {
             initMasterPeer_.call(this, peer);
+
+            peer.addPeerStatusListener(Photon.PhotonPeer.StatusCodes.connect, function () {
+                siv3dPhotonClient.masterPeer.ping(true);
+            });
     
             peer.addResponseListener(Photon.LoadBalancing.Constants.OperationCode.JoinRandomGame, function (data) {
                 siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.JoinRandomRoomReturn, errCode: data.errCode, errMsg: data.errMsg ? data.errMsg : "", actorNr: siv3dPhotonClient.myActor().actorNr });
@@ -125,7 +129,13 @@ mergeInto(LibraryManager.library, {
         
         siv3dPhotonClient.onActorLeave = function (actor, cleanup) {
             if (!cleanup) {
-                siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ActorLeave, actor: actor });
+                siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ActorLeave, actorNr: actor.actorNr, isSuspended: false });
+            }
+        };
+        
+        siv3dPhotonClient.onActorSuspend = function (actor) {
+            if (!cleanup) {
+                siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ActorLeave, actorNr: actor.actorNr, isSuspended: true });
             }
         };
         
@@ -154,9 +164,11 @@ mergeInto(LibraryManager.library, {
                 siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.ConnectionErrorReturn, errCode: errorCode, errMsg: errorMsg });
             }
         };
+
+        siv3dPhotonSetPingInterval(2000);
     },
     siv3dPhotonInitClient__sig: "viiii",
-    siv3dPhotonInitClient__deps: ["$siv3dPhotonClient", "$siv3dPhotonCallbackCode", "$siv3dPhotonClientState"],
+    siv3dPhotonInitClient__deps: ["$siv3dPhotonClient", "$siv3dPhotonCallbackCode", "$siv3dPhotonClientState", "$siv3dPhotonSetPingInterval"],
 
     siv3dPhotonConnect: function (userId_ptr, region_ptr) {
         siv3dPhotonClient.disconnect();
@@ -256,7 +268,7 @@ mergeInto(LibraryManager.library, {
                     _siv3dPhotonActorJoinCallback(callback.actorNr, callback.myself);
                     break;
                 case siv3dPhotonCallbackCode.ActorLeave:
-                    _siv3dPhotonActorLeaveCallback(callback.actor.actorNr, callback.actor.isSuspended);
+                    _siv3dPhotonActorLeaveCallback(callback.actorNr, callback.isSuspended);
                     break;
                 case siv3dPhotonCallbackCode.CustomEvent:
                     _siv3dPhotonCustomEventCallback(callback.actorNr, callback.eventCode, stringToNewUTF8(callback.message));
@@ -302,17 +314,13 @@ mergeInto(LibraryManager.library, {
         "$lengthBytesUTF16"
     ],
 
-    siv3dPhotonIsInLobby: function () {
-        return siv3dPhotonClient.isInLobby();
+    $siv3dPhotonSetPingInterval: function (interval) {
+        clearInterval(siv3dPhotonClient.pingInterval);
+        siv3dPhotonClient.pingInterval = setInterval(function () {
+            siv3dPhotonClient.updateRtt();
+        }, interval);
     },
-    siv3dPhotonIsInLobby__sig: "i",
-    siv3dPhotonIsInLobby__deps: ["$siv3dPhotonClient"],
-
-    siv3dPhotonIsJoinedToRoom: function () {
-        return siv3dPhotonClient.isJoinedToRoom();
-    },
-    siv3dPhotonIsJoinedToRoom__sig: "i",
-    siv3dPhotonIsJoinedToRoom__deps: ["$siv3dPhotonClient"],
+    $siv3dPhotonSetPingInterval__deps: ["$siv3dPhotonClient"],
 
     siv3dPhotonGetServerTime: function () {
         return siv3dPhotonClient.getServerTimeMs();
@@ -325,6 +333,18 @@ mergeInto(LibraryManager.library, {
     },
     siv3dPhotonGetRoundTripTime__sig: "i",
     siv3dPhotonGetRoundTripTime__deps: ["$siv3dPhotonClient"],
+
+    siv3dPhotonIsInLobby: function () {
+        return siv3dPhotonClient.isInLobby();
+    },
+    siv3dPhotonIsInLobby__sig: "i",
+    siv3dPhotonIsInLobby__deps: ["$siv3dPhotonClient"],
+
+    siv3dPhotonIsJoinedToRoom: function () {
+        return siv3dPhotonClient.isJoinedToRoom();
+    },
+    siv3dPhotonIsJoinedToRoom__sig: "i",
+    siv3dPhotonIsJoinedToRoom__deps: ["$siv3dPhotonClient"],
 
     siv3dPhotonJoinRandomRoom: function (maxPlayers, matchmakingMode, filter_ptr) {
         if (siv3dPhotonClient.waitingCallback) {
@@ -514,6 +534,12 @@ mergeInto(LibraryManager.library, {
     },
     siv3dPhotonGetRoomPlayerIDList__sig: "vi",
     siv3dPhotonGetRoomPlayerIDList__deps: ["$siv3dPhotonClient", "siv3dPhotonGetRoomPlayerIDListCallback"],
+
+    siv3dPhotonGetIsVisibleInCurrentRoom: function () {
+        return siv3dPhotonClient.myActor().getRoom().isVisible;
+    },
+    siv3dPhotonGetIsVisibleInCurrentRoom__sig: "i",
+    siv3dPhotonGetIsVisibleInCurrentRoom__deps: ["$siv3dPhotonClient"],
 
     siv3dPhotonSetCurrentRoomVisible: function (isVisible) {
         siv3dPhotonClient.myActor().getRoom().isVisible = isVisible;
