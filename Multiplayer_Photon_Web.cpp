@@ -18,10 +18,10 @@
 
 # include <Siv3D.hpp/Platform.hpp>
 
-# if not SIV3D_PLATFORM(WEB)
-# 	define NOMINMAX
-# 	include <LoadBalancing-cpp/inc/Client.h>
-# endif
+# define NOMINMAX
+# include <LoadBalancing-cpp/inc/Client.h>
+
+# include <Siv3D.hpp>
 
 # include "Multiplayer_Photon.hpp"
 
