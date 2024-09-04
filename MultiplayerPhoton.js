@@ -26,7 +26,6 @@ mergeInto(LibraryManager.library, {
         CustomEvent: 35,
         OnRoomListUpdate: 41,
         OnRoomPropertiesChange: 42,
-        OnPlayerPropertiesChange: 43,
     },
 
     $siv3dPhotonClientState: {
@@ -151,12 +150,8 @@ mergeInto(LibraryManager.library, {
             siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.OnRoomListUpdate });
         };
 
-        siv3dPhotonClient.onActorPropertiesChange = function (actor) {
-            siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.OnPlayerPropertiesChange, actorNr: actor.actorNr });
-        };
-
-        siv3dPhotonClient.onMyRoomPropertiesChange = function () {
-            siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.OnRoomPropertiesChange });
+        Photon.LoadBalancing.RoomInfo.prototype.onPropertiesChange = function (changedCustomProps, byClient) {
+            siv3dPhotonClient.callbackCacheList.push({ type: siv3dPhotonCallbackCode.OnRoomPropertiesChange, change: changedCustomProps });
         };
 
         siv3dPhotonClient.onError = function (errorCode, errorMsg) {
@@ -165,7 +160,9 @@ mergeInto(LibraryManager.library, {
             }
         };
 
-        siv3dPhotonSetPingInterval(2000);
+        if (!siv3dPhotonClient.pingInterval) {
+            siv3dPhotonSetPingInterval(2000);
+        }
     },
     siv3dPhotonInitClient__sig: "viiii",
     siv3dPhotonInitClient__deps: ["$siv3dPhotonClient", "$siv3dPhotonCallbackCode", "$siv3dPhotonClientState", "$siv3dPhotonSetPingInterval"],
@@ -200,8 +197,15 @@ mergeInto(LibraryManager.library, {
     siv3dPhotonDisconnect__deps: ["$siv3dPhotonClient", "$siv3dPhotonCallbackCode"],
 
     siv3dPhotonService: function () {
-        siv3dPhotonClient.updateRtt();
-        siv3dPhotonClient.syncServerTime();
+        if (siv3dPhotonClient.isJoinedToRoom())
+        {
+            const host = siv3dPhotonClient.myRoomMasterActorNr();
+            if (siv3dPhotonClient.lastMasterClient != host)
+            {
+                _siv3dPhotonOnHostChangeCallback(host, siv3dPhotonClient.lastMasterClient);
+                siv3dPhotonClient.lastMasterClient = host;
+            }
+        }
 
         let callbackCacheList = siv3dPhotonClient.callbackCacheList;
         siv3dPhotonClient.callbackCacheList = [];
@@ -277,21 +281,12 @@ mergeInto(LibraryManager.library, {
                     _siv3dPhotonOnRoomListUpdateCallback();
                     break;
                 case siv3dPhotonCallbackCode.OnRoomPropertiesChange:
+                    siv3dPhotonClient.storedRoomProperties = Object.entries(callback.change);
                     _siv3dPhotonOnRoomPropertiesChangeCallback();
                     break;
                 case siv3dPhotonCallbackCode.OnPlayerPropertiesChange:
                     _siv3dPhotonOnPlayerPropertiesChangeCallback(callback.actorNr);
                     break;
-            }
-        }
-
-        if (siv3dPhotonClient.isJoinedToRoom())
-        {
-            const host = siv3dPhotonClient.myRoomMasterActorNr();
-            if (siv3dPhotonClient.lastMasterClient != host)
-            {
-                _siv3dPhotonOnHostChangeCallback(host, siv3dPhotonClient.lastMasterClient);
-                siv3dPhotonClient.lastMasterClient = host;
             }
         }
     },
@@ -488,6 +483,7 @@ mergeInto(LibraryManager.library, {
 
     siv3dPhotonGetRoomList: function (ptr) {
         for (const room of siv3dPhotonClient.availableRooms()) {
+            siv3dPhotonClient.storedRoomProperties = Object.entries(room.getCustomProperties());
             _siv3dPhotonGetRoomListCallback(ptr, siv3dStringToNewUTF32(room.name), room.maxPlayers, room.playerCount, room.isOpen);
         }
     },
@@ -502,9 +498,9 @@ mergeInto(LibraryManager.library, {
     siv3dPhotonGetRoomNameList__sig: "vi",
     siv3dPhotonGetRoomNameList__deps: ["$siv3dPhotonClient", "siv3dPhotonGetRoomNameListCallback", "$siv3dStringToNewUTF32"],
 
-
     siv3dPhotonGetCurrentRoom: function (name_ptr, playerCount_ptr, maxPlayers_ptr, isOpen_ptr) {
         const room = siv3dPhotonClient.myActor().getRoom();
+        siv3dPhotonClient.storedRoomProperties = Object.entries(room.getCustomProperties());
         if (name_ptr != 0) setValue(name_ptr, siv3dStringToNewUTF32(room.name), "*");
         if (playerCount_ptr != 0) setValue(playerCount_ptr, room.playerCount, "i32");
         if (maxPlayers_ptr != 0) setValue(maxPlayers_ptr, room.maxPlayers, "i32");
@@ -581,84 +577,39 @@ mergeInto(LibraryManager.library, {
     siv3dPhotonSetMasterClient__sig: "vi",
     siv3dPhotonSetMasterClient__deps: ["$siv3dPhotonClient"],
 
-    siv3dPhotonGetPlayerCustomProperty: function (key_ptr, actorNr) {
-        const actor = actorNr < 0 ? siv3dPhotonClient.myActor() : siv3dPhotonClient.myRoomActors()[actorNr];
-        const found = actor.getCustomProperty(UTF32ToString(key_ptr));
+    siv3dPhotonGetRoomCustomProperty: function (key) {
+        const found = siv3dPhotonClient.myRoom().getCustomProperty(String.fromCharCode(key));
         return found ? siv3dStringToNewUTF32(found) : 0;
     },
-    siv3dPhotonGetPlayerCustomProperty__sig: "iii",
-    siv3dPhotonGetPlayerCustomProperty__deps: ["$siv3dPhotonClient", "$siv3dStringToNewUTF32", "$UTF32ToString"],
-
-    siv3dPhotonGetPlayerCustomProperties: function (ptr, actorNr) {
-        const actor = actorNr < 0 ? siv3dPhotonClient.myActor() : siv3dPhotonClient.myRoomActors()[actorNr];
-        const obj = actor.getCustomProperties();
-        for (key in obj) {
-            _siv3dPhotonGetCustomPropertiesCallback(ptr, siv3dStringToNewUTF32(key), siv3dStringToNewUTF32(obj[key]));
-        }
-    },
-    siv3dPhotonGetPlayerCustomProperties__sig: "vii",
-    siv3dPhotonGetPlayerCustomProperties__deps: ["$siv3dPhotonClient", "$siv3dStringToNewUTF32", "siv3dPhotonGetCustomPropertiesCallback"],
-
-    siv3dPhotonSetPlayerCustomProperty: function (key_ptr, value_ptr) {
-        siv3dPhotonClient.myActor().setCustomProperty(UTF32ToString(key_ptr), UTF32ToString(value_ptr));
-    },
-    siv3dPhotonSetPlayerCustomProperty__sig: "vii",
-    siv3dPhotonSetPlayerCustomProperty__deps: ["$siv3dPhotonClient", "$UTF32ToString"],
-
-    siv3dPhotonRemovePlayerCustomProperties: function (len, keys_ptr) {
-        for (let i = 0; i < len; i++) {
-            siv3dPhotonClient.myActor().setCustomProperty(UTF32ToString(HEAP32[(keys_ptr >> 2) + i]), "");
-        }
-    },
-    siv3dPhotonRemovePlayerCustomProperties__sig: "vii",
-    siv3dPhotonRemovePlayerCustomProperties__deps: ["$siv3dPhotonClient"],
-
-    siv3dPhotonGetRoomCustomProperty: function (key_ptr) {
-        const found = siv3dPhotonClient.myRoom().getCustomProperty(UTF32ToString(key_ptr));
-        return found ? siv3dStringToNewUTF32(found) : 0;
-    },
-    siv3dPhotonGetRoomCustomProperty__sig: "iii",
+    siv3dPhotonGetRoomCustomProperty__sig: "ii",
     siv3dPhotonGetRoomCustomProperty__deps: ["$siv3dPhotonClient"],
 
     siv3dPhotonGetRoomCustomProperties: function (ptr) {
         const obj = siv3dPhotonClient.myRoom().getCustomProperties();
         for (key in obj) {
-            _siv3dPhotonGetCustomPropertiesCallback(ptr, siv3dStringToNewUTF32(key), siv3dStringToNewUTF32(obj[key]));
+            _siv3dPhotonGetCustomPropertiesCallback(ptr, key.charCodeAt(0), siv3dStringToNewUTF32(obj[key]));
         }
     },
-    siv3dPhotonGetRoomCustomProperties__sig: "vii",
+    siv3dPhotonGetRoomCustomProperties__sig: "vi",
     siv3dPhotonGetRoomCustomProperties__deps: ["$siv3dPhotonClient", "$siv3dStringToNewUTF32", "siv3dPhotonGetCustomPropertiesCallback"],
 
-    siv3dPhotonSetRoomCustomProperty: function (key_ptr, value_ptr) {
-        siv3dPhotonClient.myRoom().setCustomProperty(UTF32ToString(key_ptr), UTF32ToString(value_ptr));
+    siv3dPhotonSetRoomCustomProperty: function (key, value_ptr) {
+        const room = siv3dPhotonClient.myRoom();
+        room.setCustomProperty(String.fromCharCode(key), UTF32ToString(value_ptr));
+        room.setPropsListedInLobby(Object.keys(room.getCustomProperties()));
     },
     siv3dPhotonSetRoomCustomProperty__sig: "vii",
     siv3dPhotonSetRoomCustomProperty__deps: ["$siv3dPhotonClient", "$UTF32ToString"],
 
-    siv3dPhotonRemoveRoomCustomProperties: function (len, keys_ptr) {
-        for (let i = 0; i < len; i++) {
-            siv3dPhotonClient.myRoom().setCustomProperty(UTF32ToString(HEAP32[(keys_ptr >> 2) + i]), "");
+    siv3dPhotonReceiveRoomProperties: function (key_ptr, value_ptr) {
+        const item = siv3dPhotonClient.storedRoomProperties.pop();
+        if (item !== undefined) {
+            setValue(key_ptr, item[0].charCodeAt(0), "i8");
+            setValue(value_ptr, siv3dStringToNewUTF32(item[1]), "*");
+        } else {
+            setValue(key_ptr, 0, "*");
         }
     },
-    siv3dPhotonRemoveRoomCustomProperties__sig: "vii",
-    siv3dPhotonRemoveRoomCustomProperties__deps: ["$siv3dPhotonClient", "$UTF32ToString"],
-
-    siv3dPhotonGetVisibleRoomPropertyKeys: function (ptr) {
-        const obj = siv3dPhotonClient.myRoom().getPropsListedInLobby();
-        for (let prop of obj) {
-            _siv3dPhotonGetVisibleRoomPropertyKeysCallback(ptr, siv3dStringToNewUTF32(prop));
-        }
-    },
-    siv3dPhotonGetVisibleRoomPropertyKeys__sig: "vi",
-    siv3dPhotonGetVisibleRoomPropertyKeys__deps: ["$siv3dPhotonClient", "$siv3dStringToNewUTF32", "siv3dPhotonGetVisibleRoomPropertyKeysCallback"],
-    
-    siv3dPhotonSetVisibleRoomPropertyKeys: function (len, keys_ptr) {
-        const keys = [];
-        for (let i = 0; i < len; i++) {
-            keys.push(UTF32ToString(keys_ptr + i * 4));
-        }
-        siv3dPhotonClient.myRoom().setPropsListedInLobby(keys);
-    },
-    siv3dPhotonSetVisibleRoomPropertyKeys__sig: "vii",
-    siv3dPhotonSetVisibleRoomPropertyKeys__deps: ["$siv3dPhotonClient", "$UTF32ToString"],
+    siv3dPhotonReceiveRoomProperties__sig: "vii",
+    siv3dPhotonReceiveRoomProperties__deps: ["$siv3dPhotonClient", "$siv3dStringToNewUTF32"],
 });
