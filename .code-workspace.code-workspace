@@ -6,6 +6,10 @@
 		},
 		{
 			"path": "../../shared"
+		},
+		{
+			"name": "Siv3D-MultiplayerPhoton-docs",
+			"path": "../Siv3D-MultiplayerPhoton-docs"
 		}
 	],
 	"settings": {}
