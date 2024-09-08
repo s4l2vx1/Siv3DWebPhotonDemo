@@ -897,14 +897,7 @@ namespace s3d {
 	Multiplayer_Photon::~Multiplayer_Photon()
 	{
 		disconnect();
-
-	# if SIV3D_MULTIPLAYER_PHOTON_LEGACY
-		UnregisterTypes();
-	# endif
-
-	# if SIV3D_PLATFORM(WEB)
 		g_detail = nullptr;
-	# endif
 	}
 
 	void Multiplayer_Photon::init(const std::string_view secretPhotonAppID, const StringView photonAppVersion, const Verbose verbose, const ConnectionProtocol protocol)
@@ -975,6 +968,8 @@ namespace s3d
 			}
 			return false;
 		}
+
+		m_clientState = ClientState::ConnectingToLobby;
 
 		return true;
 	}
