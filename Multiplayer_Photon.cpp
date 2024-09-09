@@ -969,7 +969,7 @@ namespace s3d
 			return false;
 		}
 
-		m_clientState = ClientState::ConnectingToLobby;
+		m_detail->m_clientState = ClientState::ConnectingToLobby;
 
 		return true;
 	}
@@ -1664,7 +1664,7 @@ namespace s3d
 		sendEvent(event, Serializer<MemoryWriter> {});
 	}
 	
-	void s3d::Formatter(FormatData& formatData, ClientState value)
+	void Formatter(FormatData& formatData, ClientState value)
 	{
 		static constexpr StringView strings[] = {
 		U"Disconnected",

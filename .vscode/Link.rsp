@@ -56,4 +56,4 @@
 --js-library OpenSiv3D/lib/Siv3D/Siv3D.js
 
 --js-library MultiplayerPhoton.js
---pre-js photon.js
+--pre-js photon/photon.js
