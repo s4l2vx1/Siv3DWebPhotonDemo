@@ -251,9 +251,6 @@ namespace s3d
 	class MultiplayerEvent
 	{
 	public:
-		SIV3D_NODISCARD_CXX20
-		MultiplayerEvent() = default;
-
 		/// @brief 送信するイベントのオプション
 		/// @param eventCode イベントコード （1～199）
 		/// @param receiverOption 送信先のターゲット指定オプション
@@ -261,7 +258,7 @@ namespace s3d
 		/// @remark Web 版では priorityIndex は無視されます。
 		template<class EventCode>
 		SIV3D_NODISCARD_CXX20
-		MultiplayerEvent(EventCode eventCode, ReceiverOption receiverOption = ReceiverOption::Others, uint8 priorityIndex = 0);
+		explicit MultiplayerEvent(EventCode eventCode, ReceiverOption receiverOption = ReceiverOption::Others, uint8 priorityIndex = 0);
 
 		/// @brief 送信するイベントのオプション
 		/// @param eventCode イベントコード （1～199）
