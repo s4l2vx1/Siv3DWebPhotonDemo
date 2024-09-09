@@ -19,15 +19,6 @@
 # pragma once
 # include <Siv3D.hpp>
 
-/// @brief 従来のMultiplayer_Photonとの互換性を保つ場合には 1、新しいバージョンのみを使用する場合には 0
-/// @remark Web版を使用する場合には必ず 0 に設定されます。
-# define SIV3D_MULTIPLAYER_PHOTON_LEGACY 1
-
-# if SIV3D_PLATFORM(WEB)
-#	undef SIV3D_MULTIPLAYER_PHOTON_LEGACY
-#	define SIV3D_MULTIPLAYER_PHOTON_LEGACY 0
-# endif
-
 # if SIV3D_PLATFORM(WINDOWS)
 #	if SIV3D_BUILD(DEBUG)
 #		pragma comment (lib, "Common-cpp/lib/Common-cpp_vc16_debug_windows_mt_x64")
@@ -104,13 +95,13 @@ namespace s3d
 	enum class ConnectionProtocol : uint8
 	{
 		Default = 0,
-	# if not SIV3D_PLATFORM(WEB)
+# if not SIV3D_PLATFORM(WEB)
 		UDP = 0,
 		TCP = 1,
-	# else
+# else
 		Ws = 0,
 		Wss = 1,
-	# endif
+# endif
 	};
 
 	class RoomCreateOption
@@ -257,7 +248,7 @@ namespace s3d
 		/// @param priorityIndex プライオリティインデックス　0に近いほど優先的に処理される
 		/// @remark Web 版では priorityIndex は無視されます。
 		SIV3D_NODISCARD_CXX20
-		explicit MultiplayerEvent(uint8 eventCode, ReceiverOption receiverOption = ReceiverOption::Others, uint8 priorityIndex = 0);
+			explicit MultiplayerEvent(uint8 eventCode, ReceiverOption receiverOption = ReceiverOption::Others, uint8 priorityIndex = 0);
 
 		/// @brief 送信するイベントのオプション
 		/// @param eventCode イベントコード （1～199）
@@ -265,7 +256,7 @@ namespace s3d
 		/// @param priorityIndex プライオリティインデックス　0に近いほど優先的に処理される
 		/// @remark Web 版では priorityIndex は無視されます。
 		SIV3D_NODISCARD_CXX20
-		MultiplayerEvent(uint8 eventCode, Array<LocalPlayerID> targetList, uint8 priorityIndex = 0);
+			MultiplayerEvent(uint8 eventCode, Array<LocalPlayerID> targetList, uint8 priorityIndex = 0);
 
 		/// @brief 送信するイベントのオプション
 		/// @param eventCode イベントコード （1～199）
@@ -273,7 +264,7 @@ namespace s3d
 		/// @param priorityIndex プライオリティインデックス　0に近いほど優先的に処理される
 		/// @remark Web 版では priorityIndex は無視されます。
 		SIV3D_NODISCARD_CXX20
-		MultiplayerEvent(uint8 eventCode, TargetGroup targetGroup, uint8 priorityIndex = 0);
+			MultiplayerEvent(uint8 eventCode, TargetGroup targetGroup, uint8 priorityIndex = 0);
 
 		[[nodiscard]]
 		uint8 eventCode() const noexcept;
@@ -331,7 +322,7 @@ namespace s3d
 
 		/// @brief デフォルトコンストラクタ。このコンストラクタを使用する場合は後で init を呼び出してください。
 		SIV3D_NODISCARD_CXX20
-		Multiplayer_Photon();
+			Multiplayer_Photon();
 
 		/// @brief マルチプレイヤー用クラスを作成します。
 		/// @param secretPhotonAppID Photon アプリケーション ID
@@ -340,7 +331,7 @@ namespace s3d
 		/// @param protocol 通信に用いるプロトコル
 		/// @remark アプリケーションバージョンが異なるプレイヤーとの通信はできません。
 		SIV3D_NODISCARD_CXX20
-		Multiplayer_Photon(std::string_view secretPhotonAppID, StringView photonAppVersion, Verbose verbose = Verbose::Yes, ConnectionProtocol protocol = ConnectionProtocol::Default);
+			Multiplayer_Photon(std::string_view secretPhotonAppID, StringView photonAppVersion, Verbose verbose = Verbose::Yes, ConnectionProtocol protocol = ConnectionProtocol::Default);
 
 		/// @brief マルチプレイヤー用クラスを作成します。
 		/// @param secretPhotonAppID Photon アプリケーション ID
@@ -349,7 +340,7 @@ namespace s3d
 		/// @param protocol 通信に用いるプロトコル
 		/// @remark アプリケーションバージョンが異なるプレイヤーとの通信はできません。
 		SIV3D_NODISCARD_CXX20
-		Multiplayer_Photon(StringView secretPhotonAppID, StringView photonAppVersion, Verbose verbose = Verbose::Yes, ConnectionProtocol protocol = ConnectionProtocol::Default);
+			Multiplayer_Photon(StringView secretPhotonAppID, StringView photonAppVersion, Verbose verbose = Verbose::Yes, ConnectionProtocol protocol = ConnectionProtocol::Default);
 
 		/// @brief マルチプレイヤー用クラスを作成します。
 		/// @param secretPhotonAppID Photon アプリケーション ID
@@ -358,7 +349,7 @@ namespace s3d
 		/// @param protocol 通信に用いるプロトコル
 		/// @remark アプリケーションバージョンが異なるプレイヤーとの通信はできません。
 		SIV3D_NODISCARD_CXX20
-		Multiplayer_Photon(std::string_view secretPhotonAppID, StringView photonAppVersion, const std::function<void(StringView)>& logger, const Verbose verbose = Verbose::Yes, ConnectionProtocol protocol = ConnectionProtocol::Default);
+			Multiplayer_Photon(std::string_view secretPhotonAppID, StringView photonAppVersion, const std::function<void(StringView)>& logger, const Verbose verbose = Verbose::Yes, ConnectionProtocol protocol = ConnectionProtocol::Default);
 
 		/// @brief マルチプレイヤー用クラスを作成します。
 		/// @param secretPhotonAppID Photon アプリケーション ID
@@ -367,7 +358,7 @@ namespace s3d
 		/// @param protocol 通信に用いるプロトコル
 		/// @remark アプリケーションバージョンが異なるプレイヤーとの通信はできません。
 		SIV3D_NODISCARD_CXX20
-		Multiplayer_Photon(StringView secretPhotonAppID, StringView photonAppVersion, const std::function<void(StringView)>& logger, const Verbose verbose = Verbose::Yes, ConnectionProtocol protocol = ConnectionProtocol::Default);
+			Multiplayer_Photon(StringView secretPhotonAppID, StringView photonAppVersion, const std::function<void(StringView)>& logger, const Verbose verbose = Verbose::Yes, ConnectionProtocol protocol = ConnectionProtocol::Default);
 
 		/// @brief デストラクタ
 		virtual ~Multiplayer_Photon();
@@ -378,14 +369,14 @@ namespace s3d
 		/// @param verbose デバッグ用の Print 出力をする場合 Verbose::Yes, それ以外の場合は Verbose::No
 		/// @remark アプリケーションバージョンが異なるプレイヤーとの通信はできません。
 		void init(std::string_view secretPhotonAppID, StringView photonAppVersion, Verbose verbose = Verbose::Yes, ConnectionProtocol protocol = ConnectionProtocol::Default);
-		
+
 		/// @brief マルチプレイヤー用クラスを初期化します。
 		/// @param secretPhotonAppID Photon アプリケーション ID
 		/// @param photonAppVersion アプリケーションのバージョン
 		/// @param verbose デバッグ用の Print 出力をする場合 Verbose::Yes, それ以外の場合は Verbose::No
 		/// @remark アプリケーションバージョンが異なるプレイヤーとの通信はできません。
 		void init(StringView secretPhotonAppID, StringView photonAppVersion, Verbose verbose = Verbose::Yes, ConnectionProtocol protocol = ConnectionProtocol::Default);
-		
+
 		/// @brief マルチプレイヤー用クラスを初期化します。
 		/// @param secretPhotonAppID Photon アプリケーション ID
 		/// @param photonAppVersion アプリケーションのバージョン
@@ -403,7 +394,7 @@ namespace s3d
 		/// @param protocol 通信に用いるプロトコル
 		/// @remark アプリケーションバージョンが異なるプレイヤーとの通信はできません。
 		void init(StringView secretPhotonAppID, StringView photonAppVersion, const std::function<void(StringView)>& logger = {}, const Verbose verbose = Verbose::Yes, ConnectionProtocol protocol = ConnectionProtocol::Default);
-		
+
 		/// @brief Photon サーバへの接続を試みます。
 		/// @param userName ユーザ名
 		/// @param region 接続するサーバのリージョン。unspecified の場合は利用可能なサーバのうち最速のものが選択されます。
@@ -452,7 +443,7 @@ namespace s3d
 		/// @return 存在するルームの名前の一覧
 		[[nodiscard]]
 		Array<RoomName> getRoomNameList() const;
-		
+
 		/// @brief サーバのタイムスタンプ（ミリ秒）を返します。
 		/// @return サーバのタイムスタンプ（ミリ秒）
 		[[nodiscard]]
@@ -479,7 +470,7 @@ namespace s3d
 		/// @param intervalMillisec pingの更新頻度（ミリ秒）
 		void setPingIntervalMillisec(int32 intervalMillisec);
 
-	# if not SIV3D_PLATFORM(WEB)
+# if not SIV3D_PLATFORM(WEB)
 		/// @brief 受信したデータのサイズ（バイト）を返します。
 		/// @return 受信したデータのサイズ（バイト）
 		[[nodiscard]]
@@ -489,7 +480,7 @@ namespace s3d
 		/// @return 送信したデータのサイズ（バイト）
 		[[nodiscard]]
 		int32 getBytesOut() const;
-	# else
+# else
 		/// @brief 受信したデータのサイズ（バイト）を返します。この関数は Web 版では利用できません。
 		/// @return 受信したデータのサイズ（バイト）
 		[[nodiscard]]
@@ -499,7 +490,7 @@ namespace s3d
 		/// @return 送信したデータのサイズ（バイト）
 		[[nodiscard]]
 		int32 getBytesOut() const = delete;
-	# endif
+# endif
 
 		/// @brief ルームの数を返します。
 		/// @return ルームの数
@@ -601,249 +592,18 @@ namespace s3d
 
 		/// @brief 全てのイベントターゲットグループから退出します。
 		void leaveAllEventTargetGroups();
-		
+
 		/// @brief ルームにイベントを送信します。
 		/// @param event イベントの送信オプション
 		/// @param args 送信するデータ
 		/// @remark Argsにはシリアライズ可能かつデフォルト構築可能な型のみが指定できます。
 		template<class... Args>
 		void sendEvent(const MultiplayerEvent& event, Args... args);
-		
+
 		/// @brief ルームにイベントを送信します。
 		/// @param event イベントの送信オプション
 		/// @param writer 送信するデータを書き込んだシリアライザ
 		void sendEvent(const MultiplayerEvent& event, const Serializer<MemoryWriter>& writer);
-
-	# if SIV3D_MULTIPLAYER_PHOTON_LEGACY
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, bool value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, uint8 value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, int16 value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, int32 value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, int64 value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, float value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, double value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const char32* value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, StringView value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const String& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Array<bool>& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Array<uint8>& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Array<int16>& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Array<int32>& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Array<int64>& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Array<float>& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Array<double>& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Array<String>& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Color& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const ColorF& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const HSV& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Point& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Vec2& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Vec3& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Vec4& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Float2& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Float3& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Float4& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Mat3x2& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Rect& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Circle& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Line& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Triangle& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const RectF& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Quad& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const Ellipse& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		void sendEvent(uint8 eventCode, const RoundRect& value, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-
-		/// @brief ルームにイベントを送信します。
-		/// @param eventCode イベントコード
-		/// @param value 送信するデータ
-		/// @param targets 送信先のプレイヤーのローカル ID, unspecified の場合は自分以外の全員
-		/// @remark ユーザ定義型を送信する際に利用します。
-		void sendEvent(uint8 eventCode, const Serializer<MemoryWriter>& writer, const Optional<Array<LocalPlayerID>>& targets = unspecified);
-	# endif
 
 		/// @brief キャッシュされたイベントを削除します。
 		/// @param eventCode 削除するイベントコード, 0 の場合は全てのイベントを削除
@@ -911,7 +671,7 @@ namespace s3d
 		/// @brief 新たなルームのホストを設定します。
 		/// @param playerID 新たなルームのホストのローカルプレイヤー ID
 		void setHost(LocalPlayerID playerID);
-		
+
 		RoomInfo getCurrentRoom() const;
 
 		/// @brief 現在参加しているルーム名を返します。
@@ -1026,7 +786,7 @@ namespace s3d
 		/// @param errorCode エラーコード。0 の場合には成功
 		/// @param errorString エラー文字列
 		virtual void joinRandomOrCreateRoomReturn(LocalPlayerID playerID, int32 errorCode, const String& errorString) {}
-		
+
 		/// @brief ロビー内のルームが更新されたときに呼ばれます。
 		virtual void onRoomListUpdate() {}
 
@@ -1046,218 +806,6 @@ namespace s3d
 		/// @param data 受信したデータ
 		/// @remark ユーザ定義型を受信する際に利用します。
 		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, Deserializer<MemoryViewReader>& reader) {}
-
-	# if SIV3D_MULTIPLAYER_PHOTON_LEGACY
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, bool data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, uint8 data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, int16 data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, int32 data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, int64 data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, float data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, double data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const String& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Array<bool>& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Array<uint8>& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Array<int16>& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Array<int32>& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Array<int64>& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Array<float>& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Array<double>& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Array<String>& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Color& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const ColorF& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const HSV& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Point& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Vec2& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Vec3& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Vec4& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Float2& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Float3& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Float4& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Mat3x2& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Rect& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Circle& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Line& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Triangle& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const RectF& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Quad& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const Ellipse& data);
-
-		/// @brief ルームのイベントを受信した際に呼ばれます。
-		/// @param playerID 送信者のローカルプレイヤー ID
-		/// @param eventCode イベントコード
-		/// @param data 受信したデータ
-		virtual void customEventAction(LocalPlayerID playerID, uint8 eventCode, const RoundRect& data);
-	# endif
 
 		/// @brief クライアントのシステムのタイムスタンプ（ミリ秒）を返します。
 		/// @return クライアントのシステムのタイムスタンプ（ミリ秒）
@@ -1292,7 +840,7 @@ namespace s3d
 
 	private:
 
-	# if not SIV3D_PLATFORM(WEB)
+# if not SIV3D_PLATFORM(WEB)
 		std::unique_ptr<ExitGames::LoadBalancing::Listener> m_listener;
 
 		std::unique_ptr<ExitGames::LoadBalancing::Client> m_client;
@@ -1300,9 +848,9 @@ namespace s3d
 		ConnectionProtocol m_connectionProtocol = ConnectionProtocol::UDP;
 
 		String m_lastJoinedRoomName;
-	# else
+# else
 		std::unique_ptr<PhotonDetail> m_detail;
-	# endif
+# endif
 
 		String m_secretPhotonAppID;
 
@@ -1327,12 +875,12 @@ namespace s3d
 				std::tuple<std::remove_cvref_t<Args>...> args{};
 				impl(static_cast<T&>(client), callback, player, reader, args, std::make_index_sequence<std::tuple_size_v<std::tuple<Args...>>>());
 			}
-	
+
 			static void impl(T& client, TypeErasedCallback callback, LocalPlayerID player, Deserializer<MemoryViewReader>& reader, std::tuple<> args, std::integer_sequence<size_t>)
 			{
 				(client.*reinterpret_cast<Multiplayer_Photon::EventCallbackType<T, Args...>>(callback))(player);
 			}
-	
+
 			template<std::size_t... I>
 			static void impl(T& client, TypeErasedCallback callback, LocalPlayerID player, Deserializer<MemoryViewReader>& reader, std::tuple<std::remove_cvref_t<Args>...> args, std::integer_sequence<size_t, I...>)
 			{
