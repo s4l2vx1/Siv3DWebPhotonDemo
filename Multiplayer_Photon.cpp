@@ -844,6 +844,39 @@ namespace s3d {
 
 	// MultiplayerEvent
 
+	MultiplayerEvent::MultiplayerEvent(uint8 eventCode, ReceiverOption receiverOption, uint8 priorityIndex)
+		: m_eventCode(eventCode)
+		, m_receiverOption(receiverOption)
+		, m_priorityIndex(priorityIndex)
+	{
+		if (not InRange(static_cast<int>(eventCode), 1, 199))
+		{
+			throw Error{ U"[Multiplayer_Photon] EventCode must be in a range of 1 to 199" };
+		}
+	}
+
+	MultiplayerEvent::MultiplayerEvent(uint8 eventCode, Array<LocalPlayerID> targetList, uint8 priorityIndex)
+		: m_eventCode(eventCode)
+		, m_targetList(targetList)
+		, m_priorityIndex(priorityIndex)
+	{
+		if (not InRange(static_cast<int>(eventCode), 1, 199))
+		{
+			throw Error{ U"[Multiplayer_Photon] EventCode must be in a range of 1 to 199" };
+		}
+	}
+
+	MultiplayerEvent::MultiplayerEvent(uint8 eventCode, TargetGroup targetGroup, uint8 priorityIndex)
+		: m_eventCode(eventCode)
+		, m_targetGroup(targetGroup.value())
+		, m_priorityIndex(priorityIndex)
+	{
+		if (not InRange(static_cast<int>(eventCode), 1, 199))
+		{
+			throw Error{ U"[Multiplayer_Photon] EventCode must be in a range of 1 to 199" };
+		}
+	}
+
 	uint8 MultiplayerEvent::eventCode() const noexcept
 	{
 		return m_eventCode;
@@ -1339,7 +1372,6 @@ namespace s3d
 /// [WEB] Multiplayer_Photon
 namespace s3d
 {
-	template<>
 	void Multiplayer_Photon::removeEventCache(uint8 eventCode)
 	{
 		if (not m_detail)
@@ -1359,7 +1391,6 @@ namespace s3d
 		);
 	}
 
-	template<>
 	void Multiplayer_Photon::removeEventCache(uint8 eventCode, const Array<LocalPlayerID>& targets)
 	{
 		if (not m_detail)
@@ -1658,12 +1689,6 @@ namespace s3d
 
 namespace s3d
 {
-	template<>
-	void Multiplayer_Photon::sendEvent<>(const MultiplayerEvent& event)
-	{
-		sendEvent(event, Serializer<MemoryWriter> {});
-	}
-	
 	void Formatter(FormatData& formatData, ClientState value)
 	{
 		static constexpr StringView strings[] = {

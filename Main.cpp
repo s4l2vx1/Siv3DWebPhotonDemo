@@ -17,7 +17,7 @@ struct MyData
 	}
 };
 
-enum class EventCode
+enum EventCode : uint8
 {
 	IntEvent = 1,
 	StringEvent,
