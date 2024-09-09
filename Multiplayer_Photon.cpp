@@ -1692,13 +1692,13 @@ namespace s3d
 	void Formatter(FormatData& formatData, ClientState value)
 	{
 		static constexpr StringView strings[] = {
-		U"Disconnected",
-		U"ConnectingToLobby",
-		U"InLobby",
-		U"JoiningRoom",
-		U"InRoom",
-		U"LeavingRoom",
-		U"Disconnecting",
+			U"Disconnected",
+			U"ConnectingToLobby",
+			U"InLobby",
+			U"JoiningRoom",
+			U"InRoom",
+			U"LeavingRoom",
+			U"Disconnecting",
 		};
 
 		formatData.string.append(strings[FromEnum(value)]);
