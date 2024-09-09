@@ -129,7 +129,7 @@ namespace s3d::detail
 		char32* siv3dPhotonGetRoomCustomProperty(uint8 key);
 
 		__attribute__((import_name("siv3dPhotonGetRoomCustomProperties")))
-		void siv3dPhotonGetRoomCustomProperties(HashTable<uint8, String>* table);
+		void siv3dPhotonGetRoomCustomProperties(RoomPropertyTable* table);
 
 		__attribute__((import_name("siv3dPhotonSetRoomCustomProperty")))
 		void siv3dPhotonSetRoomCustomProperty(uint8 key, const char32* value);
@@ -141,7 +141,7 @@ namespace s3d::detail
 
 namespace s3d::detail
 {
-	void receiveRoomProperties(HashTable<uint8, String>& table);
+	void receiveRoomProperties(RoomPropertyTable& table);
 }
 
 // [WEB] PhotonDetail
@@ -389,7 +389,7 @@ namespace s3d
 			m_context.onRoomListUpdate();
 		}
 
-		void onRoomPropertiesChange(const HashTable<uint8, String>& changes)
+		void onRoomPropertiesChange(const RoomPropertyTable& changes)
 		{
 			m_context.debugLog(U"[Multiplayer_Photon] Multiplayer_Photon::onRoomPropertiesChange()");
 			m_context.debugLog(U"[Multiplayer_Photon] - changes: {}"_fmt(Format(changes)));
@@ -439,7 +439,7 @@ namespace s3d::detail
 		__attribute__((used, export_name("siv3dPhotonGetRoomListCallback")))
 		void siv3dPhotonGetRoomListCallback(Array<RoomInfo>* array, char32* name, int32 maxPlayers, int32 playerCount, bool isOpen)
 		{
-			HashTable<uint8, String> properties {};
+			RoomPropertyTable properties {};
 			
 			detail::receiveRoomProperties(properties);	
 
@@ -558,7 +558,7 @@ namespace s3d::detail
 		}
 
 		__attribute__((used, export_name("siv3dPhotonGetCustomPropertiesCallback")))
-		void siv3dPhotonGetCustomPropertiesCallback(HashTable<uint8, String>* table, uint8 key, char32* value_)
+		void siv3dPhotonGetCustomPropertiesCallback(RoomPropertyTable* table, uint8 key, char32* value_)
 		{
 			(*table)[key] = String(value_);
 
@@ -578,7 +578,7 @@ namespace s3d::detail
 		{
 			if (not g_detail) return;
 
-			HashTable<uint8, String> table {};
+			RoomPropertyTable table {};
 
 			detail::receiveRoomProperties(table);
 
@@ -617,7 +617,7 @@ namespace s3d::detail
 		MasterClient,
 	};
 
-	String PropertyTableToJSON(const HashTable<uint8, String>& table)
+	String PropertyTableToJSON(const RoomPropertyTable& table)
 	{
 		JSON json {};
 
@@ -721,7 +721,7 @@ namespace s3d::detail
 		return json.formatMinimum();
 	}
 	
-	void receiveRoomProperties(HashTable<uint8, String>& table)
+	void receiveRoomProperties(RoomPropertyTable& table)
 	{
 		uint8 key;
 		char32* value;
@@ -777,7 +777,7 @@ namespace s3d {
 		return *this;
 	}
 
-	RoomCreateOption& RoomCreateOption::properties(const HashTable<uint8, String>& properties)
+	RoomCreateOption& RoomCreateOption::properties(const RoomPropertyTable& properties)
 	{
 		m_properties = properties;
 		return *this;
@@ -815,7 +815,7 @@ namespace s3d {
 		return m_maxPlayers;
 	}
 
-	const HashTable<uint8, String>& RoomCreateOption::properties() const noexcept
+	const RoomPropertyTable& RoomCreateOption::properties() const noexcept
 	{
 		return m_properties;
 	}
@@ -1091,7 +1091,7 @@ namespace s3d
 		return m_detail->joinRandomRoom(expectedMaxPlayers, matchmakingMode, U"{}");
 	}
 
-	bool Multiplayer_Photon::joinRandomRoom(const HashTable<uint8, String>& propertyFilter, int32 expectedMaxPlayers, MatchmakingMode matchmakingMode)
+	bool Multiplayer_Photon::joinRandomRoom(const RoomPropertyTable& propertyFilter, int32 expectedMaxPlayers, MatchmakingMode matchmakingMode)
 	{
 		if (not m_detail)
 		{
@@ -1121,7 +1121,7 @@ namespace s3d
 		return m_detail->joinRandomOrCreateRoom(roomName, U"{}", U"{}", maxPlayers, MatchmakingMode::FillOldestRoom);
 	}
 
-	bool Multiplayer_Photon::joinRandomOrCreateRoom(RoomNameView roomName, const RoomCreateOption& roomCreateOption, const HashTable<uint8, String>& propertyFilter, int32 expectedMaxPlayers, MatchmakingMode matchmakingMode)
+	bool Multiplayer_Photon::joinRandomOrCreateRoom(RoomNameView roomName, const RoomCreateOption& roomCreateOption, const RoomPropertyTable& propertyFilter, int32 expectedMaxPlayers, MatchmakingMode matchmakingMode)
 	{
 		if (not m_detail)
 		{
@@ -1647,7 +1647,7 @@ namespace s3d
 		return ret;
 	}
 
-	HashTable<uint8, String> Multiplayer_Photon::getRoomProperties() const
+	RoomPropertyTable Multiplayer_Photon::getRoomProperties() const
 	{
 		if (not m_detail)
 		{
@@ -1659,7 +1659,7 @@ namespace s3d
 			return{};
 		}
 
-		HashTable<uint8, String> result {};
+		RoomPropertyTable result {};
 
 		detail::siv3dPhotonGetRoomCustomProperties(&result);
 
