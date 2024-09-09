@@ -429,6 +429,12 @@ void Main()
 			}
 		}
 
+		if (SimpleGUI::Button(U"getLocalPlayerIDs", { x += offsetX, y }, ButtonWidth))
+		{
+			auto playerIDs = network.getLocalPlayerIDs();
+			network.debugLog(U"getLocalPlayerIDs: {}"_fmt(Format(playerIDs)));
+		}
+
 		if (SimpleGUI::Button(U"GetRoomProperties", { x = initX, y += offsetY }, ButtonWidth))
 		{
 			auto properties = network.getRoomProperties();

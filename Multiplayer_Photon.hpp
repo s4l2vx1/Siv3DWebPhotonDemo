@@ -674,6 +674,8 @@ namespace s3d
 		/// @param playerID 新たなルームのホストのローカルプレイヤー ID
 		void setHost(LocalPlayerID playerID);
 
+		/// @brief 現在参加しているルームの情報を返します。
+		/// @return 現在のルームの情報
 		RoomInfo getCurrentRoom() const;
 
 		/// @brief 現在参加しているルーム名を返します。
@@ -681,10 +683,15 @@ namespace s3d
 		[[nodiscard]]
 		String getCurrentRoomName() const;
 
-		/// @brief 現在のルームにいるローカルプレイヤーの情報一覧を返します。
-		/// @return 現在のルームにいるローカルプレイヤーの情報一覧
+		/// @brief 現在のルームにいるプレイヤーの情報の一覧を返します。
+		/// @return 現在のルームにいるプレイヤーの情報の一覧
 		[[nodiscard]]
 		Array<LocalPlayer> getLocalPlayers() const;
+
+		/// @brief 現在のルームにいるプレイヤーの LocalPlayerID の一覧を返します。
+		/// @return 現在のルームにいるプレイヤーの LocalPlayerID の一覧
+		[[nodiscard]]
+		Array<LocalPlayerID> getLocalPlayerIDs() const;
 
 		/// @brief 現在のルームに存在するプレイヤーの人数を返します。
 		/// @return プレイヤーの人数

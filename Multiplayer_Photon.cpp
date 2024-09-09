@@ -1509,6 +1509,16 @@ namespace s3d
 
 		return m_detail->m_localPlayer.localID;
 	}
+	
+	Array<LocalPlayerID> Multiplayer_Photon::getLocalPlayerIDs() const
+	{
+		if (not m_detail)
+		{
+			return {};
+		}
+
+		return m_detail->getLocalPlayerIDList();
+	}
 
 	LocalPlayerID Multiplayer_Photon::getHostLocalPlayerID() const
 	{
