@@ -358,20 +358,23 @@ namespace s3d
 
 		void customEventAction(LocalPlayerID playerID, uint8 eventCode, char* message)
 		{
-			Blob blob = Base64::Decode(message, s3d::SkipValidation::Yes); 
-
-			m_context.debugLog(U"[Multiplayer_Photon] Multiplayer_Photon::customEventAction(Deserializer<MemoryReader>)");
-			m_context.debugLog(U"- [Multiplayer_Photon] playerID: ", playerID);
-			m_context.debugLog(U"- [Multiplayer_Photon] eventCode: ", eventCode);
-			m_context.debugLog(U"- [Multiplayer_Photon] data: ", blob.size(), U" bytes (serialized)");
+			Blob blob = Base64::Decode(message, s3d::SkipValidation::Yes);
 
 			Deserializer<MemoryViewReader> reader{blob.data(), blob.size()};
 
 			if (m_context.m_table.contains(eventCode)) {
+				m_context.debugLog(U"[Multiplayer_Photon] MultiplayerEvent received (dispatched to registered event handler)");
+				m_context.debugLog(U"- [Multiplayer_Photon] playerID: ", playerID);
+				m_context.debugLog(U"- [Multiplayer_Photon] eventCode: ", eventCode);
+				m_context.debugLog(U"- [Multiplayer_Photon] data: ", blob.size(), U" bytes (serialized)");
 				auto& receiver = m_context.m_table[eventCode];
 				(receiver.second)(m_context, receiver.first, playerID, reader);
 			}
 			else {
+				m_context.debugLog(U"[Multiplayer_Photon] Multiplayer_Photon::customEventAction(Deserializer<MemoryReader>)");
+				m_context.debugLog(U"- [Multiplayer_Photon] playerID: ", playerID);
+				m_context.debugLog(U"- [Multiplayer_Photon] eventCode: ", eventCode);
+				m_context.debugLog(U"- [Multiplayer_Photon] data: ", blob.size(), U" bytes (serialized)");
 				m_context.customEventAction(playerID, eventCode, reader);
 			}
 		}
