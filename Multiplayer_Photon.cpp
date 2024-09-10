@@ -50,12 +50,6 @@ namespace s3d::detail
 		__attribute__((import_name("siv3dPhotonPing")))
 		void siv3dPhotonPing();
 
-		__attribute__((import_name("siv3dPhotonIsInLobby")))
-		bool siv3dPhotonIsInLobby();
-
-		__attribute__((import_name("siv3dPhotonIsJoinedToRoom")))
-		bool siv3dPhotonIsJoinedToRoom();
-
 		__attribute__((import_name("siv3dPhotonGetServerTime")))
 		int32 siv3dPhotonGetServerTime();
 
@@ -266,7 +260,7 @@ namespace s3d
 			const auto& region = m_context.m_requestedRegion.value();
 
 			m_context.debugLog(U"[Multiplayer_Photon] Multiplayer_Photon::connectReturn()");
-			m_context.debugLog(U"[Multiplayer_Photon] region: ", region);
+			m_context.debugLog(U"- [Multiplayer_Photon] region: ", region);
 
 			detail::LogIfError(m_context, errorCode, errorString);
 
@@ -367,9 +361,9 @@ namespace s3d
 			Blob blob = Base64::Decode(message, s3d::SkipValidation::Yes); 
 
 			m_context.debugLog(U"[Multiplayer_Photon] Multiplayer_Photon::customEventAction(Deserializer<MemoryReader>)");
-			m_context.debugLog(U"[Multiplayer_Photon] playerID: ", playerID);
-			m_context.debugLog(U"[Multiplayer_Photon] eventCode: ", eventCode);
-			m_context.debugLog(U"[Multiplayer_Photon] data: ", blob.size(), U" bytes (serialized)");
+			m_context.debugLog(U"- [Multiplayer_Photon] playerID: ", playerID);
+			m_context.debugLog(U"- [Multiplayer_Photon] eventCode: ", eventCode);
+			m_context.debugLog(U"- [Multiplayer_Photon] data: ", blob.size(), U" bytes (serialized)");
 
 			Deserializer<MemoryViewReader> reader{blob.data(), blob.size()};
 
@@ -392,7 +386,7 @@ namespace s3d
 		void onRoomPropertiesChange(const RoomPropertyTable& changes)
 		{
 			m_context.debugLog(U"[Multiplayer_Photon] Multiplayer_Photon::onRoomPropertiesChange()");
-			m_context.debugLog(U"[Multiplayer_Photon] - changes: {}"_fmt(Format(changes)));
+			m_context.debugLog(U"- [Multiplayer_Photon] changes: {}"_fmt(Format(changes)));
 
 			m_context.onRoomPropertiesChange(changes);
 		}
@@ -400,6 +394,8 @@ namespace s3d
 		void onMasterClientChanged(const int newHostID, const int oldHostID)
 		{
 			m_context.debugLog(U"[Multiplayer_Photon] Multiplayer_Photon::onHostChange()");
+			m_context.debugLog(U"- [Multiplayer_Photon] newHostID: {}"_fmt(newHostID));
+			m_context.debugLog(U"- [Multiplayer_Photon] oldHostID: {}"_fmt(oldHostID));
 
 			m_context.onHostChange(newHostID, oldHostID);
 		}
@@ -1028,24 +1024,49 @@ namespace s3d
 		return getClientState() != ClientState::Disconnected;
 	}
 	
-	ClientState Multiplayer_Photon::getClientState() const
+	ClientState Multiplayer_Photon::getClientState() const noexcept
 	{
 		return m_detail ? m_detail->m_clientState : ClientState::Disconnected;
 	}
 
-	bool Multiplayer_Photon::isInLobby() const
+	bool Multiplayer_Photon::isDisconnected() const noexcept
 	{
-		return m_detail->m_clientState == ClientState::InLobby;
+		return getClientState() == ClientState::Disconnected;
 	}
 
-	bool Multiplayer_Photon::isInLobbyOrInRoom() const
+	bool Multiplayer_Photon::isConnectingToLobby() const noexcept
+	{
+		return getClientState() == ClientState::ConnectingToLobby;
+	}
+
+	bool Multiplayer_Photon::isInLobby() const noexcept
+	{
+		return getClientState() == ClientState::InLobby;
+	}
+
+	bool Multiplayer_Photon::isJoiningRoom() const noexcept
+	{
+		return getClientState() == ClientState::JoiningRoom;
+	}
+
+	bool Multiplayer_Photon::isInRoom() const noexcept
+	{
+		return getClientState() == ClientState::InRoom;
+	}
+
+	bool Multiplayer_Photon::isLeavingRoom() const noexcept
+	{
+		return getClientState() == ClientState::LeavingRoom;
+	}
+
+	bool Multiplayer_Photon::isDisconnecting() const noexcept
+	{
+		return getClientState() == ClientState::Disconnecting;
+	}
+
+	bool Multiplayer_Photon::isInLobbyOrInRoom() const noexcept
 	{
 		return isInLobby() or isInRoom();
-	}
-
-	bool Multiplayer_Photon::isInRoom() const
-	{
-		return m_detail->m_clientState == ClientState::InRoom;
 	}
 
 	Array<RoomInfo> Multiplayer_Photon::getRoomList() const

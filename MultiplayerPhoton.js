@@ -329,18 +329,6 @@ mergeInto(LibraryManager.library, {
     siv3dPhotonGetRoundTripTime__sig: "i",
     siv3dPhotonGetRoundTripTime__deps: ["$siv3dPhotonClient"],
 
-    siv3dPhotonIsInLobby: function () {
-        return siv3dPhotonClient.isInLobby();
-    },
-    siv3dPhotonIsInLobby__sig: "i",
-    siv3dPhotonIsInLobby__deps: ["$siv3dPhotonClient"],
-
-    siv3dPhotonIsJoinedToRoom: function () {
-        return siv3dPhotonClient.isJoinedToRoom();
-    },
-    siv3dPhotonIsJoinedToRoom__sig: "i",
-    siv3dPhotonIsJoinedToRoom__deps: ["$siv3dPhotonClient"],
-
     siv3dPhotonJoinRandomRoom: function (maxPlayers, matchmakingMode, filter_ptr) {
         if (siv3dPhotonClient.waitingCallback) {
             return false;

@@ -419,22 +419,47 @@ namespace s3d
 		/// @brief ネットワークの状態を返します。
 		/// @return 現在のネットワークの状態
 		[[nodiscard]]
-		ClientState getClientState() const;
+		ClientState getClientState() const noexcept;
+
+		/// @brief サーバーから切断されているかを返します。
+		/// @return サーバーから切断されている場合 true, それ以外の場合は false
+		[[nodiscard]]
+		bool isDisconnected() const noexcept;
+
+		/// @brief ロビーに接続中かを返します。
+		/// @return ロビーに接続中の場合 true, それ以外の場合は false
+		[[nodiscard]]
+		bool isConnectingToLobby() const noexcept;
 
 		/// @brief 自分がロビーにいるかを返します。
 		/// @return ロビーにいる場合 true, それ以外の場合は false
 		[[nodiscard]]
-		bool isInLobby() const;
+		bool isInLobby() const noexcept;
 
-		/// @brief 自分がロビーまたはルームにいるかを返します。
-		/// @return ロビーまたはルームいる場合 true, それ以外の場合は false
+		/// @brief ルームに参加中かを返します。
+		/// @return ルームに参加中の場合 true, それ以外の場合は false
 		[[nodiscard]]
-		bool isInLobbyOrInRoom() const;
+		bool isJoiningRoom() const noexcept;
 
 		/// @brief 自分がルームに参加しているかを返します。
 		/// @return ルームに参加している場合 true, それ以外の場合は false
 		[[nodiscard]]
-		bool isInRoom() const;
+		bool isInRoom() const noexcept;
+
+		/// @brief ルームから退出中かを返します。
+		/// @return ルームから退出中の場合 true, それ以外の場合は false
+		[[nodiscard]]
+		bool isLeavingRoom() const noexcept;
+
+		/// @brief サーバーから切断中かを返します。
+		/// @return サーバーから切断中の場合 true, それ以外の場合は false
+		[[nodiscard]]
+		bool isDisconnecting() const noexcept;
+
+		/// @brief 自分がロビーまたはルームにいるかを返します。
+		/// @return ロビーまたはルームいる場合 true, それ以外の場合は false
+		[[nodiscard]]
+		bool isInLobbyOrInRoom() const noexcept;
 
 		/// @brief 存在するルームの一覧を返します。
 		/// @return 存在するルームの一覧
