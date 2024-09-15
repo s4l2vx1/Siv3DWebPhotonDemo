@@ -1723,6 +1723,12 @@ namespace s3d
 
 namespace s3d
 {
+	template<>
+	void Multiplayer_Photon::sendEvent<>(const MultiplayerEvent& event)
+	{
+		sendEvent(event, Serializer<MemoryWriter> {});
+	}
+	
 	void Formatter(FormatData& formatData, ClientState value)
 	{
 		static constexpr StringView strings[] = {
