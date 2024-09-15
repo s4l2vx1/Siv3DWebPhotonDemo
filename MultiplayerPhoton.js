@@ -503,7 +503,7 @@ mergeInto(LibraryManager.library, {
         for (const actorNr in actors) {
             if (filter >= 0 && filter != actorNr) continue;
             const actor = actors[actorNr];
-            _siv3dPhotonGetRoomPlayerListCallback(ptr, actorNr, siv3dStringToNewUTF32(actor.name), siv3dStringToNewUTF32(actor.userId), siv3dPhotonClient.myRoomMasterActorNr() == actorNr, !actor.isSuspended);
+            _siv3dPhotonGetRoomPlayerListCallback(ptr, actorNr, siv3dStringToNewUTF32(actor.name), siv3dStringToNewUTF32(actor.userId), siv3dPhotonClient.myRoomMasterActorNr() == actorNr, !actor.isSuspended());
         }
     },
     siv3dPhotonGetRoomPlayerList__sig: "vi",
@@ -541,7 +541,7 @@ mergeInto(LibraryManager.library, {
         const actor = siv3dPhotonClient.myActor();
         if (localId_ptr != 0) setValue(localId_ptr, actor.actorNr, "i32");
         if (isHost_ptr != 0) setValue(isHost_ptr, siv3dPhotonClient.myRoomMasterActorNr() == actor.actorNr, "i8");
-        if (isActive_ptr != 0) setValue(isActive_ptr, !actor.isSuspended, "i8");
+        if (isActive_ptr != 0) setValue(isActive_ptr, !actor.isSuspended(), "i8");
     },
     siv3dPhotonUpdateLocalPlayer__sig: "viii",
     siv3dPhotonUpdateLocalPlayer__deps: ["$siv3dPhotonClient"],
